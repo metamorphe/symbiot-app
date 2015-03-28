@@ -25,15 +25,11 @@
  *
  */
 
-#ifndef BlinkM_funcs_h
-#define BlinkM_funcs_h
-
 #include <Arduino.h>
 #include <Wire.h>
 
-
 extern "C" { 
-#include "utility/twi.h"  // from Wire library, so we can do bus scanning
+#include <utility/twi.h>  // from Wire library, so we can do bus scanning
 }
 
 
@@ -505,7 +501,5 @@ static int BlinkM_doFactoryReset()
     writeScript( addr, script);
   */
   
-};
-
-#endif
+}
 
