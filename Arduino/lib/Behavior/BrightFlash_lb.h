@@ -1,0 +1,1 @@
+../../../Compression/behaviors/commands/BrightFlash_lb.h
