@@ -1,1 +1,0 @@
-../../../Compression/behaviors/commands/TransmissionFixedBrightness_lb.h

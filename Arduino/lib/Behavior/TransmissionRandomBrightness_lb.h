@@ -1,1 +1,0 @@
-../../../Compression/behaviors/commands/TransmissionRandomBrightness_lb.h

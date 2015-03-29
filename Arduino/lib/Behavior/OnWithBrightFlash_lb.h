@@ -1,1 +1,0 @@
-../../../Compression/behaviors/commands/OnWithBrightFlash_lb.h
