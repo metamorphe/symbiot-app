@@ -1,11 +1,10 @@
-#include "util/variables.h"
+#include "variables.h"
 #include "buffer.h"
 #include <Arduino.h>
 #include "BlinkM.h"
 #include "interpreter.h"
 
 
-unsigned long lastPress = 0;
 
 
 // Function prototypes

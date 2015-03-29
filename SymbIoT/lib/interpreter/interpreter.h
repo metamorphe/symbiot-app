@@ -7,6 +7,12 @@
  *
  */
 /* BlinkM dependencies */
+
+
+
+#ifndef Interpreter_h
+#define Interpreter_h
+
 #include "Wire.h"
 #include "BlinkM_funcs.h"
 
@@ -16,16 +22,11 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 
-
-
-
-#ifndef Interpreter_h
-#define Interpreter_h
-
 /* Structs and enums */
-#include "util/variables.h"
+#include "variables.h"
 #include "buffer.h"
 
+ 
 typedef enum { 
 	role_ping_out = 1, 
 	role_pong_back 
