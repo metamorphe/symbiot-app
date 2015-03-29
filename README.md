@@ -1,10 +1,7 @@
 Project Members
 ---
-Cesar Torres <cearto@berkeley.edu>
-Tim Campbell <timcam@berkeley.edu>
-Jasper O'Leary <j.oleary@berkeley.edu>
-Akhila Raju <akhilaraju@berkeley.edu>
-Kenny Wang <kennyw1019@gmail.com>
+* Cesar Torres <cearto@berkeley.edu>
+* Jasper O'Leary <j.oleary@berkeley.edu>
 
 
 Project Skeleton & Dependencies
@@ -14,9 +11,9 @@ https://github.com/WeAreLeka/Bare-Arduino-Project
 
 Running Code
 ---
-Update Makefile
-make 
-make upload
+1. Update the Makefile (path to local copy of Arduino)
+2. make 
+3. make upload
 
 
 Viewing Serial Output
