@@ -1,12 +1,9 @@
 #include "interpreter.h"
 
-
-
-
+#define TIMEOUT 3000
 
 /* rF configuration */
 RF24 radio(9,10); 
-
 
 const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 // Set default role
@@ -45,9 +42,9 @@ int setup_radio()
 
 int setup_buffer(size_t bytes){
   READ_HEAD_BUF = (lightscript_header *) malloc(bytes);
-  if (!READ_HEAD_BUF) { return -1; }
-  else return 1;
+  return (!READ_HEAD_BUF) ? -1 : 1;
 }
+
 // wait for header first!
 void receive()
 {
@@ -71,11 +68,16 @@ void receive()
   /* Read payload */
   bool done = false;
   uint8_t curr_line = 0;
+  unsigned long read_payload_start_time = millis();
   while (!done)
   {
     // Fetch the payload, and see if this was the last one.
-    if (!radio.available()) {
+    if (!radio.available())
       continue; // spin if nothing available, does not account for packet loss
+    if (millis() - read_payload_start_time >= TIMEOUT)
+    {
+      Serial.print("Timeout during reading payload.\n");
+      Serial.print("\r\ncmd>");
     }
     radio.read(&READ_BUF[curr_line], sizeof(blinkm_script_line));
     Serial.print("Got line with dur: ");

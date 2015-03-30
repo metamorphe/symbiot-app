@@ -14,27 +14,28 @@
 
 
 /* Hard-coded lightscripts for testing purposes */
- blinkm_script_line script1_lines[] = {
+blinkm_script_line script1_lines[] = {
   { 10, { 'n', 0xfe,0xfe,0xfe}},
   { 5, { 'n', 0x00,0x00,0x00}},
   { 10, { 'n', 0xfe,0xfe,0xfe}},
   { 5, { 'n', 0x00,0x00,0x00}}
 };
- blinkm_script_line script2_lines[] = {
+blinkm_script_line script2_lines[] = {
   { 10, { 'n', 0xfe,0x00,0x00}},
   { 10, { 'n', 0x00,0xfe,0x00}},
   { 10, { 'n', 0x00,0x00,0xfe}},
   { 1, { 'n', 0x00,0x00,0x00}}
 };
- uint8_t script1_len = 4;
- uint8_t script2_len = 4;
+uint8_t script1_len = 4;
+uint8_t script2_len = 4;
 
 // Basic flash-red script for testing
- blinkm_script_line flash_red_lines[] = {
+blinkm_script_line flash_red_lines[] = {
   { 10, { 'n', 0xfe,0x00,0x00}},
   { 5, { 'n', 0x00,0x00,0x00}},
   { 10, { 'n', 0xfe,0x00,0x00}},
   { 5, { 'n', 0x00,0x00,0x00}}
 };
- int flash_red_len = 4;
+
+int flash_red_len = 4;
 
