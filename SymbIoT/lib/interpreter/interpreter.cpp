@@ -71,14 +71,15 @@ void receive()
   unsigned long read_payload_start_time = millis();
   while (!done)
   {
-    // Fetch the payload, and see if this was the last one.
-    if (!radio.available())
-      continue; // spin if nothing available, does not account for packet loss
     if (millis() - read_payload_start_time >= TIMEOUT)
     {
       Serial.print("Timeout during reading payload.\n");
       Serial.print("\r\ncmd>");
+      return;
     }
+    // Fetch the payload, and see if this was the last one.
+    if (!radio.available())
+      continue; // spin if nothing available, does not account for packet loss
     radio.read(&READ_BUF[curr_line], sizeof(blinkm_script_line));
     Serial.print("Got line with dur: ");
     Serial.println(READ_BUF[curr_line].dur, DEC);
@@ -122,9 +123,14 @@ void send(blinkm_script_line *script_lines, uint8_t script_len,
   delay(500);
   /* Send main script */
   Serial.println("Now sending: ");
+  unsigned long send_line_start_time = millis();
   for (int i = 0; i < script_len; i++)
   {
-
+    if (millis() - send_line_start_time >= TIMEOUT)
+    {
+      Serial.println("Error: timeout during sending lines.");
+      goto SetReceiver;
+    }
     ok = radio.write(&script_lines[i], sizeof(blinkm_script_line));
     if (ok)
       Serial.println("Send line ok... ");
@@ -134,10 +140,11 @@ void send(blinkm_script_line *script_lines, uint8_t script_len,
     }
   }
   
-  Serial.println("Setting back as receiver");
-  role = role_pong_back;
-  radio.openWritingPipe(pipes[1]);
-  radio.openReadingPipe(1,pipes[0]);
-  radio.startListening();
-  Serial.print("done.");
+  SetReceiver:
+    Serial.println("Setting back as receiver");
+    role = role_pong_back;
+    radio.openWritingPipe(pipes[1]);
+    radio.openReadingPipe(1,pipes[0]);
+    radio.startListening();
+    Serial.print("done.");
 }
