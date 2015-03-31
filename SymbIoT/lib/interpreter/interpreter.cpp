@@ -30,7 +30,6 @@ int setup_radio()
 {
     radio.begin();
     radio.setRetries(15,15);
-    
     // Become the primary receiver (pong back)
     role = role_pong_back;
     radio.openWritingPipe(pipes[1]);
@@ -49,18 +48,19 @@ int setup_buffer(size_t bytes){
 void receive()
 {
   if (!radio.available()) { return; }
+  Serial.println("Receiving.");
   /* Check header */
   bool found_header = false;
   while (!found_header)
   {
-    Serial.println("Attempting to read header...");
+    //Serial.println("Attempting to read header...");
     found_header = radio.read( READ_HEAD_BUF, sizeof(lightscript_header));
   }
   uint8_t script_len = READ_HEAD_BUF->num_lines;
   uint8_t delay_sec = READ_HEAD_BUF->delay_sec;
-  Serial.print("Got header and will malloc read buffer with # lines: ");
+  //Serial.print("Got header and will malloc read buffer with # lines: ");
   Serial.println(script_len);
-  Serial.print("Header dictates playback delay of seconds: ");
+  //Serial.print("Header dictates playback delay of seconds: ");
   Serial.println(delay_sec);
   realloc_read_buf(READ_BUF, script_len);
   unsigned long temp_buf;
@@ -71,21 +71,25 @@ void receive()
   unsigned long read_payload_start_time = millis();
   while (!done)
   {
-    if (millis() - read_payload_start_time >= TIMEOUT)
+    if (millis() - read_payload_start_time < TIMEOUT)
+    {
+      if (!radio.available())
+      {
+        continue; 
+      }
+      radio.read(&READ_BUF[curr_line], sizeof(blinkm_script_line));
+      //Serial.print("Got line with dur: ");
+      Serial.println(READ_BUF[curr_line].dur, DEC);
+      curr_line++;
+      if (curr_line >= script_len) {
+        done = true;
+      }
+    }
+    else
     {
       Serial.print("Timeout during reading payload.\n");
       Serial.print("\r\ncmd>");
       return;
-    }
-    // Fetch the payload, and see if this was the last one.
-    if (!radio.available())
-      continue; // spin if nothing available, does not account for packet loss
-    radio.read(&READ_BUF[curr_line], sizeof(blinkm_script_line));
-    Serial.print("Got line with dur: ");
-    Serial.println(READ_BUF[curr_line].dur, DEC);
-    curr_line++;
-    if (curr_line >= script_len) {
-      done = true;
     }
   }
   
@@ -97,7 +101,7 @@ void receive()
 }
 
 void send(blinkm_script_line *script_lines, uint8_t script_len,
-              uint8_t delay_sec)
+          uint8_t delay_sec)
 {
   Serial.println("Setting this node as transmitter...");
   role = role_ping_out;
@@ -110,9 +114,9 @@ void send(blinkm_script_line *script_lines, uint8_t script_len,
   lightscript_header header;
   header.num_lines = script_len;
   header.delay_sec = delay_sec;
-  Serial.print("Sending header--script len is: ");
+  //Serial.print("Sending header--script len is: ");
   Serial.println(header.num_lines);
-  Serial.print("Sending with delay: ");
+  //Serial.print("Sending with delay: ");
   Serial.println(header.delay_sec);
   bool ok = radio.write(&header, sizeof(lightscript_header));
   if (ok)
@@ -120,12 +124,13 @@ void send(blinkm_script_line *script_lines, uint8_t script_len,
   else
     Serial.println("Send failed.");
 
-  delay(500);
+  //delay(500);
   /* Send main script */
-  Serial.println("Now sending: ");
+  //Serial.println("Now sending: ");
   unsigned long send_line_start_time = millis();
   for (int i = 0; i < script_len; i++)
   {
+    //delay(200);
     if (millis() - send_line_start_time >= TIMEOUT)
     {
       Serial.println("Error: timeout during sending lines.");
@@ -133,9 +138,10 @@ void send(blinkm_script_line *script_lines, uint8_t script_len,
     }
     ok = radio.write(&script_lines[i], sizeof(blinkm_script_line));
     if (ok)
-      Serial.println("Send line ok... ");
+      //Serial.println("Send line ok... ");
+      ;
     else {
-      Serial.println("Send line failed. Trying again...");
+      //Serial.println("Send line failed. Trying again...");
       i--;
     }
   }

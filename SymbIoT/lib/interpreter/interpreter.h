@@ -14,7 +14,7 @@
 #define Interpreter_h
 
 #include "Wire.h"
-#include "BlinkM_funcs.h"
+#include "BlinkM.h"
 
 
 /* rF dependencies */
