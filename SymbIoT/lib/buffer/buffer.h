@@ -10,9 +10,12 @@
 #ifndef Buffer_h
 #define Buffer_h
 
-extern lightscript_header *READ_HEAD_BUF;
-extern blinkm_script_line *READ_BUF;
-extern char serInStr[30];
+// extern lightscript_header *READ_HEAD_BUF;
+// extern blinkm_script_line *READ_BUF;
+// extern char serInStr[32];
+// extern char buffer[32];
+// extern RF24NetworkHeader header;
+// extern uint8_t num_lines;
 
 // /* Utility functions */
 void realloc_read_buf(blinkm_script_line *orig_ptr, uint8_t script_len);

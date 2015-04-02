@@ -1,8 +1,6 @@
 
 /**
- * config.h
- * 
- * More info goes here
+ * This file should be phased out eventually.
  *
  */
 
@@ -10,16 +8,14 @@
 #include <Wire.h>
 #include "BlinkM_funcs.h"
 
-#ifndef config_h
-#define config_h
+#ifndef Variables_h
+#define Variables_h
 
 // /* Config */
 // #define BLINKM_FUNCS_DEBUG 1
 
 #define blinkm_addr 0x09 // First port that BlinkM assigns per bean
 
-
-extern const uint64_t pipes[2];
 extern const unsigned int max_script_lines; // max capacity of uint8_t
 
 
