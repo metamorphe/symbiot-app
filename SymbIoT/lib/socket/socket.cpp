@@ -43,14 +43,30 @@ int
 receive()
 {
   network.update();
-  if (!radio.available ())
+  if (!network.available ())
+  {
     return 0;
+  }
 
-  network.read (header, &buffer, sizeof(buffer));
-  printf_P (PSTR ("%lu: APP Received message of type %c from %u\n\r"), millis (),
-                  header.type, header.from_node);
-  if (header.type == 'A')
-    num_lines = (uint8_t) buffer[0];
+  RF24NetworkHeader header;
+  network.peek(header);
+  printf_P (PSTR ("%lu: APP Received message of type %c from % "PRIu16 "\n\r"),
+                    millis (), header.type, header.from_node);
+  // TODO: functionalize handlers
+  switch (header.type)
+  {
+    case 'A':
+      network.read (header, &num_lines, sizeof (num_lines));
+      break;
+    case 'L':
+      // TODO: increment buffer pointer per line read
+      network.read (header, &buffer, sizeof (buffer));
+      break;
+    default:
+      printf_P(PSTR("*** WARNING *** Unknown message type %c\n\r"),header.type);
+      network.read(header,0,0);
+      break;
+  }
   return 1;
 }
 
@@ -58,9 +74,12 @@ void
 send (uint16_t to_node, uint16_t from_node, blinkm_script_line *src,
       uint8_t num_lines)
 {
+  printf_P(PSTR("%lu: APP Begin message from %" PRIu16 " to %" PRIu16 ".\n\r"),
+                millis (), from_node, to_node);
   send_alloc_message (to_node, from_node, num_lines);
   for (int i = 0; i < num_lines; i++)
   {
+    delay(500);
     send_line_message (to_node, from_node, src + i);
   }
 }
@@ -69,9 +88,10 @@ static void
 send_alloc_message (uint16_t to_node, uint16_t from_node,
                     uint8_t num_lines)
 {
-  header.to_node = to_node;
-  header.from_node = from_node;
-  header.type = 'A';
+  RF24NetworkHeader header(to_node, 'A');
+  // header.to_node = to_node;
+  // header.from_node = from_node;
+  // header.type = 'A';
   uint8_t _num_lines = num_lines;
   bool ok = network.write (header, &_num_lines, sizeof (num_lines));
   if (ok)
@@ -84,9 +104,10 @@ static void
 send_line_message(uint16_t to_node, uint16_t from_node,
                   blinkm_script_line *line)
 {
-  header.to_node = to_node;
-  header.from_node = from_node;
-  header.type = 'L';
+  RF24NetworkHeader header(to_node, 'L');
+  // header.to_node = to_node;
+  // header.from_node = from_node;
+  // header.type = 'L';
   bool ok = network.write (header, line, sizeof (line));
   if (ok)
     printf_P(PSTR("%lu: APP Send line message ok\n\r"), millis());

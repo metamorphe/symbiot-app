@@ -2,7 +2,9 @@
 #include <Arduino.h>
 #include "BlinkM.h"
 #include "socket.h"
-// #include "buffer.h"
+
+#define IS_DIGIT(c) ((c >= '0' && c <= '9') ? 1 : 0)
+#include "printf.h"
 
 // Function prototypes
 void help (void);
@@ -17,29 +19,31 @@ uint16_t this_node;
 int received;
 char serInStr[32];
 
-// /* Main Code */
+/* Main Code */
 
 void setup()
 {
-  this_node = 00;
+  /* IMPORTANT: address must be specified for all uploads. */
+  this_node = 01;
+
 	setup_blinkM ();    
 	setup_radio (this_node);
+  printf_begin ();
   help ();
   Serial.print("cmd>");
 }
 
 void loop()
 {
-	received = receive();
+	received = receive ();
 
-  if (received)
-    actuate ();
+  // if (received)
+  //   actuate ();
   
     //read the serial port and create a string out of what you read
   if( readSerialString() ) {
     Serial.println(serInStr);
     char cmd = serInStr[0];
-    int num = atoi(serInStr+1);
     if ( cmd == 'p' ) {
       Serial.println("Sending command on serial to blinkM...");
       BlinkM_writeScript( blinkm_addr, 0, script1_len, 0, script1_lines);
@@ -47,8 +51,9 @@ void loop()
       BlinkM_playScript( blinkm_addr, 0,1,0 );
       Serial.print("\r\ncmd>");
     }
-    else if ( cmd == 's') {
-      if (num > 0 || num < 5)
+    else if (IS_DIGIT(cmd)) {
+      uint16_t num = cmd - '0';
+      if (num > 01)
         Serial.println("Invalid destination node address.");
       else
         send (num, this_node, script2_lines, script2_len);
@@ -59,7 +64,7 @@ void loop()
       BlinkM_stopScript( blinkm_addr );
       Serial.print("\r\ncmd>");
     }
-    else if( cmd =='0' ) {
+    else if( cmd =='x' ) {
       Serial.println("Fade to black");
       BlinkM_fadeToRGB( blinkm_addr, 0,0,0);
       Serial.print("\r\ncmd>");
@@ -78,9 +83,9 @@ help (void)
 {
   Serial.println("\r\nBlinkMScriptWriter!\r\n"
 	 "'p' to write the script and play once\r\n"
-	 "'s' to send the script to nearby nodes\r\n"
+	 "'<node address>' to send the script to a specified node\r\n"
 	 "'o' to stop script playback\r\n"
-	 "'0' to fade to black\r\n"
+	 "'x' to fade to black\r\n"
 	 "'f' to flash red\r\n"
    ); 
 }
