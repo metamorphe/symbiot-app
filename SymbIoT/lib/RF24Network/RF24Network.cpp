@@ -190,6 +190,8 @@ size_t RF24Network::read(RF24NetworkHeader& header,void* message, size_t maxlen)
 
 bool RF24Network::write(RF24NetworkHeader& header,const void* message, size_t len)
 {
+  printf_P(PSTR("%lu: WRITE Begin message from %" PRIu16 " to %" PRIu16 " message is % "PRIu8 ".\n\r"),
+              millis (), header.from_node, header.to_node, *((uint8_t *) message));
   // Fill out the header
   header.from_node = node_address;
 
@@ -222,7 +224,10 @@ bool RF24Network::write(uint16_t to_node)
   
   // Throw it away if it's not a valid address
   if ( !is_valid_address(to_node) )
+  {
+    printf_P(PSTR("%lu: Error: WRITE: sending to invalid address.\n\r"));
     return false;
+  }
 
   // First, stop listening so we can talk.
   //radio.stopListening();

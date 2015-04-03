@@ -23,13 +23,15 @@ char serInStr[32];
 
 void setup()
 {
-  /* IMPORTANT: address must be specified for all uploads. */
-  this_node = 01;
+  this_node = nodeconfig_read ();
 
 	setup_blinkM ();    
 	setup_radio (this_node);
   printf_begin ();
   help ();
+
+  Serial.print ("Welcome! This node's id is: ");
+  Serial.println (this_node);
   Serial.print("cmd>");
 }
 
@@ -53,7 +55,7 @@ void loop()
     }
     else if (IS_DIGIT(cmd)) {
       uint16_t num = cmd - '0';
-      if (num > 01)
+      if (num > 8)
         Serial.println("Invalid destination node address.");
       else
         send (num, this_node, script2_lines, script2_len);

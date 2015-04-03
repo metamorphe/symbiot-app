@@ -20,6 +20,7 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "RF24Network.h"
+#include "nodeconfig.h"
 
 /* Structs and enums */
 #include "variables.h"

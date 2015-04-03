@@ -7,7 +7,7 @@ RF24 radio(9,10);
 RF24Network network(radio);
 
 char buffer[32];
-RF24NetworkHeader header;
+// RF24NetworkHeader header;
 uint8_t num_lines;
 
 static void send_alloc_message (uint16_t, uint16_t, uint8_t);
@@ -77,23 +77,23 @@ send (uint16_t to_node, uint16_t from_node, blinkm_script_line *src,
   printf_P(PSTR("%lu: APP Begin message from %" PRIu16 " to %" PRIu16 ".\n\r"),
                 millis (), from_node, to_node);
   send_alloc_message (to_node, from_node, num_lines);
-  for (int i = 0; i < num_lines; i++)
-  {
-    delay(500);
-    send_line_message (to_node, from_node, src + i);
-  }
+  // for (int i = 0; i < num_lines; i++)
+  // {
+  //   delay(500);
+  //   send_line_message (to_node, from_node, src + i);
+  // }
 }
 
 static void
 send_alloc_message (uint16_t to_node, uint16_t from_node,
                     uint8_t num_lines)
 {
+  printf_P(PSTR("%lu: ALLOC Begin message from %" PRIu16 " to %" PRIu16 ".\n\r"),
+              millis (), from_node, to_node);
   RF24NetworkHeader header(to_node, 'A');
-  // header.to_node = to_node;
-  // header.from_node = from_node;
-  // header.type = 'A';
+  header.from_node = from_node;
   uint8_t _num_lines = num_lines;
-  bool ok = network.write (header, &_num_lines, sizeof (num_lines));
+  bool ok = network.write (header, &_num_lines, sizeof (_num_lines));
   if (ok)
     printf_P(PSTR("%lu: APP Send alloc message ok\n\r"), millis ());
   else
@@ -105,9 +105,7 @@ send_line_message(uint16_t to_node, uint16_t from_node,
                   blinkm_script_line *line)
 {
   RF24NetworkHeader header(to_node, 'L');
-  // header.to_node = to_node;
-  // header.from_node = from_node;
-  // header.type = 'L';
+  header.from_node = from_node;
   bool ok = network.write (header, line, sizeof (line));
   if (ok)
     printf_P(PSTR("%lu: APP Send line message ok\n\r"), millis());
