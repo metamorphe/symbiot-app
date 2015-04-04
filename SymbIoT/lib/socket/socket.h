@@ -26,8 +26,8 @@
 #include "variables.h"
 #include "buffer.h"
 
-extern char buffer[32];
-extern RF24NetworkHeader header;
+extern blinkm_script_line buffer[16];
+extern RF24NetworkHeader *most_recent_header;
 extern uint8_t num_lines;
 
 /* Setup functions */

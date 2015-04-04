@@ -24,9 +24,8 @@ char serInStr[32];
 void setup()
 {
   this_node = nodeconfig_read ();
-
-	setup_blinkM ();    
-	setup_radio (this_node);
+  setup_blinkM ();    
+  setup_radio (this_node);
   printf_begin ();
   help ();
 
@@ -37,10 +36,10 @@ void setup()
 
 void loop()
 {
-	received = receive ();
+  received = receive ();
 
-  // if (received)
-  //   actuate ();
+  if (received && most_recent_header->type == 'E')
+    actuate ();
   
     //read the serial port and create a string out of what you read
   if( readSerialString() ) {
