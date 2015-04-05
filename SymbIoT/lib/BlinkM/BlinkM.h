@@ -1,6 +1,3 @@
-
-
-
 /*
  *  Actuator Interface - Header File
  *  ------------------------------------
@@ -15,9 +12,7 @@
 
 
 #include "BlinkM_funcs.h"
-typedef struct _lightscript_header {
-  uint8_t num_lines;
-  uint8_t delay_sec;
-} lightscript_header;
+
+#define blinkm_addr 0x09 // First port that BlinkM assigns per bean
 
 #endif /* defined(__Expresso__blinkm__) */

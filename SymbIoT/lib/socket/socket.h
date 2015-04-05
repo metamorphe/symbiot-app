@@ -1,5 +1,3 @@
-// Interpreter H File
-
 /**
  * Interpreter.h
  * 

@@ -1,5 +1,5 @@
-#include "variables.h"
 #include <Arduino.h>
+#include "variables.h"
 #include "BlinkM.h"
 #include "socket.h"
 
@@ -98,33 +98,6 @@ actuate (void)
                       (blinkm_script_line *) buffer);
   BlinkM_playScript (blinkm_addr, 0, 1,0);
 }
-
-// TODO: refactor for unicasting
-// void handle_button_press(void)
-// {
-//   if (digitalRead(buttonInput) == HIGH) {
-//     unsigned long pressTime = millis();
-//     if (pressTime - lastPress > 1000) {
-//       lastPress = pressTime;
-//       Serial.print("Button pressed. Broadcasting behavior.\r\n");
-//       BlinkM_writeScript( blinkm_addr, 0, script2_len, 0, script2_lines);
-//       BlinkM_playScript( blinkm_addr, 0,1,0 );
-//       send(script2_lines, script2_len, 0);
-//       Serial.print("\r\ncmd>");
-//     }
-//   }
-//   if (digitalRead(delayButtonInput) == HIGH) {
-//     unsigned long pressTime = millis();
-//     if (pressTime - lastPress > 1000) {
-//       lastPress = pressTime;
-//       Serial.print("Button pressed. Broadcasting behavior.\r\n");
-//       BlinkM_writeScript( blinkm_addr, 0, script2_len, 0, script2_lines);
-//       BlinkM_playScript( blinkm_addr, 0,1,0 );
-//       send(script2_lines, script2_len, 2);
-//       Serial.print("\r\ncmd>");
-//     }
-//   }
-// }
 
 uint8_t
 readSerialString (void)
