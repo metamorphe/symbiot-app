@@ -59,16 +59,22 @@ void scheduler_process(String keyData, String valueData){
     value = constrain(value, 0, 4096);
     value = map(value, 0, 1001, 0, 500);
     
+
     // SEND TO CORRECT NODE 
 
+    // RESOLVE ADDRESS (ADDRESS SPACE IS BASE 16)
+    int board = key / 16;
+    int addr = key % 16;
+    Serial.print("Sending to");
+    Serial.print(addr);
+    Serial.print("with value");
+    Serial.println(value);
     // value = map(value, 0, 1001, 0, 4096);
     
     // Serial.println(value);
     // analogWrite(key, value);
     
-    // // RESOLVE ADDRESS
-    // int board = key / 16;
-    // int addr = key % 16;
+   
     
     // if(board == 0)
     //   light_a.setPWM(addr, 0, value);
