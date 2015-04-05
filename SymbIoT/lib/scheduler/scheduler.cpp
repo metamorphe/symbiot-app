@@ -65,9 +65,9 @@ void scheduler_process(String keyData, String valueData){
     // RESOLVE ADDRESS (ADDRESS SPACE IS BASE 16)
     int board = key / 16;
     int addr = key % 16;
-    Serial.print("Sending to");
+    Serial.print("Sending to ");
     Serial.print(addr);
-    Serial.print("with value");
+    Serial.print("with value ");
     Serial.println(value);
     // value = map(value, 0, 1001, 0, 4096);
     
