@@ -41,40 +41,6 @@ int delimiter = (int) '\n';
 int comma = (int) ',';
 bool key = true;
 
-void process(String keyData, String valueData){
-    unsigned int n = keyData.length() + 1;
-    keyData.toCharArray(buffer, n);
-   
-    int key = atoi(buffer);
-
-    // Convert ASCII-encoded integer to an int
-    n = valueData.length() + 1;
-    valueData.toCharArray(buffer, n);
-    int value = atoi(buffer);
-
-
-    // value = map(value, 0, 1000, 0, 255);
-    value = constrain(value, 0, 4096);
-    value = map(value, 0, 1001, 0, 500);
-    // value = map(value, 0, 1001, 0, 4096);
-    
-    // Serial.println(value);
-    // analogWrite(key, value);
-    
-    // RESOLVE ADDRESS
-    int board = key / 16;
-    int addr = key % 16;
-    if(board == 0)
-      light_a.setPWM(addr, 0, value);
-    else if(board == 1)
-      light_b.setPWM(addr, 0, value);
-    else if(board == 2){
-      
-      value = map(value, 0, 1001, 150, 525);
-      // light_a.setPWM(0, 0, value);
-      servos.setPWM(addr, 0, value);
-    }
-}
 void loop() {
     while (Serial.available()) {
         int ch = Serial.read();

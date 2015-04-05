@@ -2,6 +2,7 @@
 #include "variables.h"
 #include "BlinkM.h"
 #include "socket.h"
+#include "scheduler.h"
 
 #define IS_DIGIT(c) ((c >= '0' && c <= '9') ? 1 : 0)
 #define SERIAL_BUFFER_SIZE 32
@@ -20,6 +21,10 @@ void welcome_message(void);
 uint16_t this_node;
 int received;
 char serInStr[SERIAL_BUFFER_SIZE];
+
+
+
+
 
 /* Main Code */
 
@@ -98,6 +103,15 @@ void loop()
         BlinkM_playScript( blinkm_addr, 0,1,0 );
         Serial.print("\r\ncmd>");
     }
+    else if(cmd =='s'){
+      //go to scheduling routine!
+      schedulder_parse_key_value(serInStr, SERIAL_BUFFER_SIZE);
+    }
+    else{
+      Serial.print("Command"); 
+      Serial.print(cmd);
+      Serial.println("received, but not understood.");
+    }
   }
 }
 
@@ -127,7 +141,7 @@ readSerialString (void)
     // Check buffer overflow
     i++;
   }
-  serInStr[i] = 0;  // indicate end of read string
+  serInStr[i] = '\0';  // indicate end of read string
   return i;  // return number of chars read
 }
 
