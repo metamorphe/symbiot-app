@@ -69,6 +69,12 @@ void scheduler_process(String keyData, String valueData){
     Serial.print(addr);
     Serial.print("with value ");
     Serial.println(value);
+
+
+    // JASPER:
+    // NETWORK COMMAND GOES HERE
+    // send(addr, from_addr, command_syntax_i_do_not_know);
+
     // value = map(value, 0, 1001, 0, 4096);
     
     // Serial.println(value);
