@@ -2,8 +2,10 @@
 #include "variables.h"
 #include "BlinkM.h"
 #include "socket.h"
+#include "scheduler.h"
 
 #define IS_DIGIT(c) ((c >= '0' && c <= '9') ? 1 : 0)
+#define SERIAL_BUFFER_SIZE 32
 #include "printf.h"
 
 // Function prototypes
@@ -14,12 +16,39 @@ void handle_alloc_message (void);
 void handle_line_message (void);
 void actuate (void);
 uint8_t readSerialString (void);
+void welcome_message(void);
 
 uint16_t this_node;
 int received;
-char serInStr[32];
+char serInStr[SERIAL_BUFFER_SIZE];
+
+
+
+
 
 /* Main Code */
+
+void 
+welcome_message(void)
+{
+  Serial.print("Welcome! This node's id is: ");
+  Serial.println (this_node);
+  Serial.print("cmd>");
+}
+
+
+void 
+help (void)
+{
+  Serial.println("\r\nBlinkMScriptWriter!\r\n"
+   "'p' to write the script and play once\r\n"
+   "'<node address>' to send the script to a specified node\r\n"
+   "'o' to stop script playback\r\n"
+   "'x' to fade to black\r\n"
+   "'f' to flash red\r\n"
+   ); 
+}
+
 
 void setup()
 {
@@ -28,10 +57,7 @@ void setup()
   setup_radio (this_node);
   printf_begin ();
   help ();
-
-  Serial.print ("Welcome! This node's id is: ");
-  Serial.println (this_node);
-  Serial.print("cmd>");
+  welcome_message();
 }
 
 void loop()
@@ -45,6 +71,7 @@ void loop()
   if( readSerialString() ) {
     Serial.println(serInStr);
     char cmd = serInStr[0];
+
     if ( cmd == 'p' ) {
       Serial.println("Sending command on serial to blinkM...");
       BlinkM_writeScript( blinkm_addr, 0, script1_len, 0, script1_lines);
@@ -76,20 +103,18 @@ void loop()
         BlinkM_playScript( blinkm_addr, 0,1,0 );
         Serial.print("\r\ncmd>");
     }
+    else if(cmd =='s'){
+      //go to scheduling routine!
+      schedulder_parse_key_value(serInStr, SERIAL_BUFFER_SIZE);
+    }
+    else{
+      Serial.print("Command"); 
+      Serial.print(cmd);
+      Serial.println("received, but not understood.");
+    }
   }
 }
 
-void
-help (void)
-{
-  Serial.println("\r\nBlinkMScriptWriter!\r\n"
-	 "'p' to write the script and play once\r\n"
-	 "'<node address>' to send the script to a specified node\r\n"
-	 "'o' to stop script playback\r\n"
-	 "'x' to fade to black\r\n"
-	 "'f' to flash red\r\n"
-   ); 
-}
 
 void
 actuate (void)
@@ -108,10 +133,15 @@ readSerialString (void)
   delay(10);  // wait a little for serial data
   int i = 0;
   while (Serial.available()) {
-    serInStr[i] = Serial.read();   // FIXME: doesn't check buffer overrun
+    if(i >= (SERIAL_BUFFER_SIZE - 1)){ //need extra byte to hold terminating 0
+      Serial.println("Serial buffer overflow!");
+      break;
+    }
+    serInStr[i] = Serial.read();   
+    // Check buffer overflow
     i++;
   }
-  serInStr[i] = 0;  // indicate end of read string
+  serInStr[i] = '\0';  // indicate end of read string
   return i;  // return number of chars read
 }
 
