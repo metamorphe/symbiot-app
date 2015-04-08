@@ -10,8 +10,10 @@
 
 #include <Arduino.h>
 #include "string.h"
-void scheduler_process(String keyData, String valueData);
-void schedulder_parse_key_value(char* serial_buffer, size_t size);
+#include "command.h"
+
+void scheduler_process(String, String, uint16_t);
+void schedulder_parse_key_value(char *, size_t, uint16_t);
 
 #endif /* defined(__Expresso__scheduler__) */
 

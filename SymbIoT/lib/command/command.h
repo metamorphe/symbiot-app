@@ -39,7 +39,7 @@ void command_set_color (uint16_t, uint16_t, uint8_t, uint8_t,
 
 void command_fade_on (uint16_t, uint16_t);
 void command_fade_off (uint16_t, uint16_t);
-void command_set_intensity (uint16_t, uint16_t, int);
+void command_fade_to_intensity (uint16_t, uint16_t, int);
 void command_fade_to_color (uint16_t, uint16_t, uint8_t, uint8_t,
 						uint8_t);
 

@@ -11,11 +11,9 @@ int comma = (int) ',';
 bool key = true;
 
 
-void schedulder_parse_key_value(char* serial_buffer, size_t size) {
+void schedulder_parse_key_value(char* serial_buffer, size_t size, uint16_t this_node) {
     //discard the first command byte
     for(uint8_t i = 1; i < size; i++){
-      Serial.println (serial_buffer[i]);
-      
       int ch = serial_buffer[i];
 
       if(serial_buffer[i] == '\0'){
@@ -31,7 +29,7 @@ void schedulder_parse_key_value(char* serial_buffer, size_t size) {
       }
       else if (ch == delimiter || ch == other_delimiter) {
         key = true;
-        scheduler_process(keyData, valueData);
+        scheduler_process(keyData, valueData, this_node);
         keyData = "";
         valueData = "";
         break;
@@ -46,26 +44,18 @@ void schedulder_parse_key_value(char* serial_buffer, size_t size) {
 }
 
 
-void scheduler_process(String keyData, String valueData){
+void scheduler_process(String keyData, String valueData, uint16_t this_node){
     unsigned int n = keyData.length() + 1;
     keyData.toCharArray(scheduler_buffer, n);
    
     int key = atoi(scheduler_buffer);
 
-    // Convert ASCII-encoded integer to an int
+    /* Convert ASCII-encoded integer to an int */
     n = valueData.length() + 1;
     valueData.toCharArray(scheduler_buffer, n);
     int value = atoi(scheduler_buffer);
 
-
-    // value = map(value, 0, 1000, 0, 255);
-    value = constrain(value, 0, 4096);
-    value = map(value, 0, 1001, 0, 500);
-    
-
-    // SEND TO CORRECT NODE 
-
-    // RESOLVE ADDRESS (ADDRESS SPACE IS BASE 16)
+    /* Resolve address (address space is base 16) */
     int board = key / 16;
     int addr = key % 16;
     Serial.print("Sending to ");
@@ -73,26 +63,7 @@ void scheduler_process(String keyData, String valueData){
     Serial.print(" with value ");
     Serial.println(value);
 
-
-    // JASPER:
-    // NETWORK COMMAND GOES HERE
-    // send(addr, from_addr, command_syntax_i_do_not_know);
-
-    // value = map(value, 0, 1001, 0, 4096);
-    
-    // Serial.println(value);
-    // analogWrite(key, value);
-    
-   
-    
-    // if(board == 0)
-    //   light_a.setPWM(addr, 0, value);
-    // else if(board == 1)
-    //   light_b.setPWM(addr, 0, value);
-    // else if(board == 2){
-      
-    //   value = map(value, 0, 1001, 150, 525);
-    //   // light_a.setPWM(0, 0, value);
-    //   servos.setPWM(addr, 0, value);
+    /* Send to network */
+    command_set_intensity ((uint16_t) addr, this_node, value);
 }
 

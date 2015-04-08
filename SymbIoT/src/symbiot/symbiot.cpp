@@ -112,7 +112,7 @@ void loop()
       //go to scheduling routine!
       Serial.print ("Will parse: ");
       Serial.println (serInStr);
-      schedulder_parse_key_value  (serInStr, SERIAL_BUFFER_SIZE);
+      schedulder_parse_key_value  (serInStr, SERIAL_BUFFER_SIZE, this_node);
       Serial.print ("\r\ncmd>");
     }
     else if (cmd == '\n' || cmd == '\r')

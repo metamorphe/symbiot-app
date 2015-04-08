@@ -12,9 +12,8 @@ command_set_color (uint16_t to_node, uint16_t from_node,
 void command_set_intensity (uint16_t to_node, uint16_t from_node,
                             int percentage)
 {
-  percentage = (percentage > 100) ? 100 : percentage;
-  percentage = (percentage < 0) ? 0 : percentage;
-  uint16_t normalized = (uint16_t) ((int) percentage * (2.56))
+  percentage = constrain (percentage, 0, 100);
+  uint16_t normalized = (uint16_t) map (percentage, 0, 100, 0, 255);
   command_set_color (to_node, from_node, normalized, normalized,
                      normalized);
 }
@@ -40,14 +39,13 @@ command_fade_to_color (uint16_t to_node, uint16_t from_node,
   send (to_node, from_node, &set_line, 1);
 }
 
-void command_fade_intensity (uint16_t to_node, uint16_t from_node,
+void command_fade_to_intensity (uint16_t to_node, uint16_t from_node,
                             int percentage)
 {
-  percentage = (percentage > 100) ? 100 : percentage;
-  percentage = (percentage < 0) ? 0 : percentage;
-  uint16_t normalized = (uint16_t) ((int) percentage * (2.56))
+  percentage = constrain (percentage, 0, 100);
+  uint16_t normalized = (uint16_t) map (percentage, 0, 100, 0, 255);
   command_fade_to_color (to_node, from_node, normalized, normalized,
-                         normalized);
+                     normalized);
 }
 
 void
