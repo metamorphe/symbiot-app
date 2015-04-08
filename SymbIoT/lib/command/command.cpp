@@ -9,6 +9,16 @@ command_set_color (uint16_t to_node, uint16_t from_node,
   send (to_node, from_node, &set_line, 1);
 }
 
+void command_set_intensity (uint16_t to_node, uint16_t from_node,
+                            int percentage)
+{
+  percentage = (percentage > 100) ? 100 : percentage;
+  percentage = (percentage < 0) ? 0 : percentage;
+  uint16_t normalized = (uint16_t) ((int) percentage * (2.56))
+  command_set_color (to_node, from_node, normalized, normalized,
+                     normalized);
+}
+
 void
 command_turn_on (uint16_t to_node, uint16_t from_node)
 {
@@ -28,6 +38,16 @@ command_fade_to_color (uint16_t to_node, uint16_t from_node,
 {
   blinkm_script_line set_line = { 1, { 'c', red_val, blue_val, green_val} };
   send (to_node, from_node, &set_line, 1);
+}
+
+void command_fade_intensity (uint16_t to_node, uint16_t from_node,
+                            int percentage)
+{
+  percentage = (percentage > 100) ? 100 : percentage;
+  percentage = (percentage < 0) ? 0 : percentage;
+  uint16_t normalized = (uint16_t) ((int) percentage * (2.56))
+  command_fade_to_color (to_node, from_node, normalized, normalized,
+                         normalized);
 }
 
 void

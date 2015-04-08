@@ -22,10 +22,6 @@ uint16_t this_node;
 int received;
 char serInStr[SERIAL_BUFFER_SIZE];
 
-
-
-
-
 /* Main Code */
 
 void 
@@ -49,7 +45,6 @@ help (void)
    ); 
 }
 
-
 void setup()
 {
   this_node = nodeconfig_read ();
@@ -65,21 +60,27 @@ void loop()
   received = receive ();
 
   if (received && most_recent_header->type == 'E')
+  {
     actuate ();
+    Serial.print ("\r\ncmd>");
+  }
   
     //read the serial port and create a string out of what you read
-  if( readSerialString() ) {
-    Serial.println(serInStr);
+  if (readSerialString ())
+  {
+    Serial.println (serInStr);
     char cmd = serInStr[0];
 
-    if ( cmd == 'p' ) {
+    if ( cmd == 'p' )
+    {
       Serial.println("Sending command on serial to blinkM...");
       BlinkM_writeScript( blinkm_addr, 0, script1_len, 0, script1_lines);
       Serial.println("Sent. Playing script...");
       BlinkM_playScript( blinkm_addr, 0,1,0 );
       Serial.print("\r\ncmd>");
     }
-    else if (IS_DIGIT(cmd)) {
+    else if (IS_DIGIT(cmd))
+    {
       uint16_t num = cmd - '0';
       if (num > 8)
         Serial.println("Invalid destination node address.");
@@ -87,34 +88,39 @@ void loop()
         send (num, this_node, script2_lines, script2_len);
       Serial.print("\r\ncmd>");
     }
-    else if( cmd == 'o' ) {
+    else if( cmd == 'o' )
+    {
       Serial.println("Stopping Script 0");
       BlinkM_stopScript( blinkm_addr );
       Serial.print("\r\ncmd>");
     }
-    else if( cmd =='x' ) {
-      Serial.println("Fade to black");
-      BlinkM_fadeToRGB( blinkm_addr, 0,0,0);
-      Serial.print("\r\ncmd>");
+    else if( cmd =='x' )
+    {
+      Serial.println ("Fade to black");
+      BlinkM_fadeToRGB (blinkm_addr, 0, 0, 0);
+      Serial.print ("\r\ncmd>");
     }
-    else if( cmd =='f' ) {
-        Serial.println("Flash red");
-        BlinkM_writeScript( blinkm_addr, 0, flash_red_len, 0, flash_red_lines);
-        BlinkM_playScript( blinkm_addr, 0,1,0 );
-        Serial.print("\r\ncmd>");
+    else if( cmd =='f' )
+    {
+        Serial.println ("Flash red");
+        BlinkM_writeScript (blinkm_addr, 0, flash_red_len, 0, flash_red_lines);
+        BlinkM_playScript (blinkm_addr, 0,1,0 );
+        Serial.print ("\r\ncmd>");
     }
-    else if(cmd =='s'){
+    else if (cmd =='s')
+    {
       //go to scheduling routine!
-      schedulder_parse_key_value(serInStr, SERIAL_BUFFER_SIZE);
+      schedulder_parse_key_value  (serInStr, SERIAL_BUFFER_SIZE);
     }
-    else{
-      Serial.print("Command"); 
-      Serial.print(cmd);
-      Serial.println("received, but not understood.");
+    else
+    {
+      Serial.print ("Command" ); 
+      Serial.print (cmd);
+      Serial.println (" received, but not understood.");
+      Serial.print ("\r\ncmd>");
     }
   }
 }
-
 
 void
 actuate (void)
@@ -133,7 +139,8 @@ readSerialString (void)
   delay(10);  // wait a little for serial data
   int i = 0;
   while (Serial.available()) {
-    if(i >= (SERIAL_BUFFER_SIZE - 1)){ //need extra byte to hold terminating 0
+    if(i >= (SERIAL_BUFFER_SIZE - 1))
+    { //need extra byte to hold terminating 0
       Serial.println("Serial buffer overflow!");
       break;
     }
