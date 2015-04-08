@@ -68,8 +68,8 @@ void loop()
     //read the serial port and create a string out of what you read
   if (readSerialString ())
   {
-    Serial.println (serInStr);
     char cmd = serInStr[0];
+    Serial.print ("\r\n");
 
     if ( cmd == 'p' )
     {
@@ -102,15 +102,22 @@ void loop()
     }
     else if( cmd =='f' )
     {
-        Serial.println ("Flash red");
-        BlinkM_writeScript (blinkm_addr, 0, flash_red_len, 0, flash_red_lines);
-        BlinkM_playScript (blinkm_addr, 0,1,0 );
-        Serial.print ("\r\ncmd>");
+      Serial.println ("Flash red");
+      BlinkM_writeScript (blinkm_addr, 0, flash_red_len, 0, flash_red_lines);
+      BlinkM_playScript (blinkm_addr, 0,1,0 );
+      Serial.print ("\r\ncmd>");
     }
     else if (cmd =='s')
     {
       //go to scheduling routine!
+      Serial.print ("Will parse: ");
+      Serial.println (serInStr);
       schedulder_parse_key_value  (serInStr, SERIAL_BUFFER_SIZE);
+      Serial.print ("\r\ncmd>");
+    }
+    else if (cmd == '\n' || cmd == '\r')
+    {
+      Serial.print ("\r\ncmd>");
     }
     else
     {
@@ -125,7 +132,7 @@ void loop()
 void
 actuate (void)
 {
-  BlinkM_writeScript  (blinkm_addr, 0, num_lines, 0,
+  BlinkM_writeScript (blinkm_addr, 0, num_lines, 0,
                       (blinkm_script_line *) buffer);
   BlinkM_playScript (blinkm_addr, 0, 1,0);
 }
@@ -133,24 +140,27 @@ actuate (void)
 uint8_t
 readSerialString (void)
 {
-  if(!Serial.available()) {
+  if (!Serial.available ())
     return 0;
-  }
-  delay(10);  // wait a little for serial data
-  int i = 0;
-  while (Serial.available()) {
-    if(i >= (SERIAL_BUFFER_SIZE - 1))
+  delay (10);  // wait a little for serial data
+  uint8_t i = 0;
+  char c;
+  while (1)
+  {
+    if (!Serial.available ())
+      continue;
+    c = Serial.read ();
+    if (i >= (SERIAL_BUFFER_SIZE - 1))
     { //need extra byte to hold terminating 0
-      Serial.println("Serial buffer overflow!");
+      Serial.println ("Serial buffer overflow!");
       break;
     }
-    serInStr[i] = Serial.read();   
-    // Check buffer overflow
+    Serial.print (c);
+    serInStr[i] = c;
     i++;
+    if (c == '\n' || c == '\r')
+      break;
   }
   serInStr[i] = '\0';  // indicate end of read string
   return i;  // return number of chars read
 }
-
-
-

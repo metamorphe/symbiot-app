@@ -12,7 +12,6 @@
 #include "Wire.h"
 #include "BlinkM.h"
 
-
 /* rF dependencies */
 #include <SPI.h>
 #include "nRF24L01.h"

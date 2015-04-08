@@ -6,6 +6,7 @@ char scheduler_buffer[12];
 String keyData = "";
 String valueData = "";
 int delimiter = (int) '\n';
+int other_delimiter = (int) '\r';
 int comma = (int) ',';
 bool key = true;
 
@@ -13,6 +14,7 @@ bool key = true;
 void schedulder_parse_key_value(char* serial_buffer, size_t size) {
     //discard the first command byte
     for(uint8_t i = 1; i < size; i++){
+      Serial.println (serial_buffer[i]);
       
       int ch = serial_buffer[i];
 
@@ -21,12 +23,13 @@ void schedulder_parse_key_value(char* serial_buffer, size_t size) {
       }
       else if (ch == -1) {
         // Handle error
+        Serial.println ("Parsing error.");
       }
       else if (ch == comma){
         key = false;
-        break;
+        continue;
       }
-      else if (ch == delimiter) {
+      else if (ch == delimiter || ch == other_delimiter) {
         key = true;
         scheduler_process(keyData, valueData);
         keyData = "";
@@ -67,7 +70,7 @@ void scheduler_process(String keyData, String valueData){
     int addr = key % 16;
     Serial.print("Sending to ");
     Serial.print(addr);
-    Serial.print("with value ");
+    Serial.print(" with value ");
     Serial.println(value);
 
 
