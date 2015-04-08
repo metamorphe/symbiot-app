@@ -1,5 +1,7 @@
 #include "command.h"
 
+static void command_self_flash_helper (uint8_t, uint8_t, uint8_t);
+
 void
 command_set_color (uint16_t to_node, uint16_t from_node,
                    uint8_t red_val, uint8_t green_val,
@@ -58,4 +60,44 @@ void
 command_fade_off (uint16_t to_node, uint16_t from_node)
 {
   command_fade_to_color (to_node, from_node, 0x00, 0x00, 0x00);
+}
+
+static void
+command_self_flash_helper (uint8_t red_val, uint8_t green_val,
+                           uint8_t blue_val)
+{
+  blinkm_script_line set_lines[] =
+  {
+    { 10, { 'n', red_val, blue_val, green_val} },
+    { 5, { 'n', 0x00, 0x00, 0x00} },
+    { 10, { 'n', red_val, blue_val, green_val} },
+    { 5, { 'n', 0x00, 0x00, 0x00} }
+  };
+  BlinkM_writeScript (blinkm_addr, 0, 4, 0, set_lines);
+  BlinkM_playScript (blinkm_addr, 0,1,0 );
+}
+
+void command_self_flash_red (void)
+{
+  command_self_flash_helper (0xff, 0x00, 0x00);
+}
+
+void command_self_flash_green (void)
+{
+  command_self_flash_helper (0x00, 0xff, 0x00);
+}
+
+void command_self_flash_blue (void)
+{
+  command_self_flash_helper (0x00, 0x00, 0xff);
+}
+
+void command_self_flash_yellow (void)
+{
+  command_self_flash_helper (0xff, 0xff, 0x00);
+}
+
+void command_self_flash_white (void)
+{
+  command_self_flash_helper (0xff, 0xff, 0xff);
 }

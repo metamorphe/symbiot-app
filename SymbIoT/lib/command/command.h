@@ -43,4 +43,10 @@ void command_fade_to_intensity (uint16_t, uint16_t, int);
 void command_fade_to_color (uint16_t, uint16_t, uint8_t, uint8_t,
 						uint8_t);
 
+void command_self_flash_red (void);
+void command_self_flash_green (void);
+void command_self_flash_blue (void);
+void command_self_flash_yellow (void);
+void command_self_flash_white (void);
+
 #endif
