@@ -16,23 +16,6 @@ static void send_line_message (uint16_t, uint16_t, blinkm_script_line *);
 static void send_end_message (uint16_t, uint16_t);
 
 int
-setup_blinkM ()
-{
-  BlinkM_beginWithPower ();
-  BlinkM_setAddress (blinkm_addr);
-  
-  Serial.begin(19200); 
-  int rc = BlinkM_checkAddress( blinkm_addr );
-  
-  if( rc == -1 ) 
-    Serial.println("\r\nno response");
-  else if( rc == 1 )
-    Serial.println("\r\naddr mismatch");
-
-  return -1;
-}
-
-int
 setup_radio (uint16_t node_addr)
 {
   radio.begin ();
@@ -46,9 +29,7 @@ receive()
 {
   network.update();
   if (!network.available ())
-  {
     return 0;
-  }
 
   RF24NetworkHeader header;
   network.peek(header);

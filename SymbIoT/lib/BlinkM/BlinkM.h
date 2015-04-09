@@ -15,4 +15,22 @@
 
 #define blinkm_addr 0x09 // First port that BlinkM assigns per bean
 
+static int
+setup_blinkM (void)
+{
+  BlinkM_beginWithPower ();
+  BlinkM_setAddress (blinkm_addr);
+  
+  int rc = BlinkM_checkAddress (blinkm_addr);
+  
+  if( rc == -1 ) 
+    Serial.println("\r\nno response");
+  else if( rc == 1 )
+    Serial.println("\r\naddr mismatch");
+  else
+  	BlinkM_setStartupParamsDefault (blinkm_addr);
+
+  return -1;
+}
+
 #endif /* defined(__Expresso__blinkm__) */

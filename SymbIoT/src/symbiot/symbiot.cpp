@@ -29,7 +29,6 @@ welcome_message(void)
 {
   Serial.print("Welcome! This node's id is: ");
   Serial.println (this_node);
-  Serial.print("cmd>");
 }
 
 
@@ -47,12 +46,21 @@ help (void)
 
 void setup()
 {
-  this_node = nodeconfig_read ();
-  setup_blinkM ();    
-  setup_radio (this_node);
+  /* Begin all communication, read EEPROM, and print address. */
+  Serial.begin (19200);
   printf_begin ();
   help ();
-  welcome_message();
+  this_node = nodeconfig_read ();
+  welcome_message ();
+
+  /* BlinkM overhead */
+  setup_blinkM ();
+  BlinkM_setStartupParamsDefault (blinkm_addr);
+  // BlinkM_stopScript( blinkm_addr );
+  // BlinkM_fadeToRGB (blinkm_addr, 0, 0, 0);
+
+  setup_radio (this_node);
+  Serial.print("cmd>");
 }
 
 void loop()
@@ -103,8 +111,7 @@ void loop()
     else if( cmd =='f' )
     {
       Serial.println ("Flash red");
-      BlinkM_writeScript (blinkm_addr, 0, flash_red_len, 0, flash_red_lines);
-      BlinkM_playScript (blinkm_addr, 0,1,0 );
+      command_self_flash_red ();
       Serial.print ("\r\ncmd>");
     }
     else if (cmd =='s')
