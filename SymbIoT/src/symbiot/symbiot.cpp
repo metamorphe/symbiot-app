@@ -27,8 +27,8 @@ char serInStr[SERIAL_BUFFER_SIZE];
 void 
 welcome_message(void)
 {
-  Serial.print("Welcome! This node's id is: ");
-  Serial.println (this_node);
+  Serial.print("Welcome! This node's id is: 0");
+  Serial.println (this_node, OCT);
 }
 
 
