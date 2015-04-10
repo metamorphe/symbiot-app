@@ -22,12 +22,22 @@ setup_blinkM ()
   BlinkM_setAddress (blinkm_addr);
   
   Serial.begin(19200); 
+
+  int8_t addr = BlinkM_findFirstI2CDevice();
+  Serial.print("Found BlinkM on:");
+  Serial.println(addr);
+
+
+  Serial.print("Looking for BlinkM on ");
+  Serial.println(blinkm_addr);
   int rc = BlinkM_checkAddress( blinkm_addr );
   
   if( rc == -1 ) 
     Serial.println("\r\nno response");
   else if( rc == 1 )
     Serial.println("\r\naddr mismatch");
+  else
+    Serial.println("\r\nBlinkM found.");
 
   return -1;
 }

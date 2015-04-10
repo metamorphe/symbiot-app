@@ -2,7 +2,6 @@
 #include "variables.h"
 #include "BlinkM.h"
 #include "socket.h"
-#include "scheduler.h"
 
 #define IS_DIGIT(c) ((c >= '0' && c <= '9') ? 1 : 0)
 #define SERIAL_BUFFER_SIZE 32
@@ -30,10 +29,9 @@ char serInStr[SERIAL_BUFFER_SIZE];
 
 void 
 welcome_message(void)
-{
-  Serial.print("Welcome! This node's id is: ");
-  Serial.println (this_node);
-  Serial.print("\r\ncmd>");
+{  
+  Serial.print("Welcome! We are testing BlinkM on 19200: "); 
+  Serial.print("cmd>");
 }
 
 
@@ -52,21 +50,12 @@ help (void)
 
 void setup()
 {
-  this_node = nodeconfig_read ();
-  setup_blinkM ();    
-  setup_radio (this_node);
-  printf_begin ();
-  help ();
+  setup_blinkM ();   // baudrate 19200
   welcome_message();
 }
 
 void loop()
-{
-  received = receive ();
-
-  if (received && most_recent_header->type == 'E')
-    actuate ();
-  
+{ 
     //read the serial port and create a string out of what you read
   if( readSerialString() ) {
     Serial.println(serInStr);
@@ -103,27 +92,14 @@ void loop()
         BlinkM_playScript( blinkm_addr, 0,1,0 );
         Serial.print("\r\ncmd>");
     }
-    else if(cmd =='s'){
-      //go to scheduling routine!
-      schedulder_parse_key_value(serInStr, SERIAL_BUFFER_SIZE);
-    }
     else{
       Serial.print("Command"); 
       Serial.print(cmd);
       Serial.println("received, but not understood.");
-      help();
     }
   }
 }
 
-
-void
-actuate (void)
-{
-  BlinkM_writeScript  (blinkm_addr, 0, num_lines, 0,
-                      (blinkm_script_line *) buffer);
-  BlinkM_playScript (blinkm_addr, 0, 1,0);
-}
 
 uint8_t
 readSerialString (void)
