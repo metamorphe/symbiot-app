@@ -24,7 +24,6 @@ const uint16_t node_address_set[10] = { 00, 02, 05, 012, 015, 022, 025, 032, 035
 uint8_t nodeconfig_read(void)
 {
   uint8_t result = 0;
-
   // Look for the token in EEPROM to indicate the following value is
   // a validly set node address 
   if ( eeprom_read_byte(address_at_eeprom_location) == valid_eeprom_flag )

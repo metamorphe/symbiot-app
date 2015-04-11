@@ -3,7 +3,7 @@
 #define TIMEOUT 3000
 
 /* rF configuration */
-RF24 radio(9,10); 
+RF24 radio(A0,10); 
 RF24Network network(radio);
 
 blinkm_script_line buffer[16];
@@ -48,6 +48,7 @@ setup_radio (uint16_t node_addr)
   radio.begin ();
   radio.setRetries (15,15);
   network.begin (90, node_addr);
+  Serial.println("Radio has been setup!");
   return 1;
 }
 
