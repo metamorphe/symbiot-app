@@ -7,6 +7,7 @@ RF24 radio(9,10);
 RF24Network network(radio);
 
 blinkm_script_line buffer[16];
+RF24NetworkHeader header;
 RF24NetworkHeader *most_recent_header;
 uint8_t num_lines;
 static uint8_t current_line_num;
@@ -14,6 +15,11 @@ static uint8_t current_line_num;
 static void send_alloc_message (uint16_t, uint16_t, uint8_t);
 static void send_line_message (uint16_t, uint16_t, blinkm_script_line *);
 static void send_end_message (uint16_t, uint16_t);
+
+static inline void handle_alloc_message (void);
+static inline void handle_line_message (void);
+static inline void handle_end_message (void);
+static inline void handle_unknown_message (void);
 
 int
 setup_radio (uint16_t node_addr)
@@ -31,30 +37,23 @@ receive()
   if (!network.available ())
     return 0;
 
-  RF24NetworkHeader header;
   network.peek(header);
-  printf_P (PSTR ("%lu: APP Received message of type %c from % "PRIu16 "\n\r"),
+  printf_P (PSTR ("APP Received message of type %c from % "PRIu16 "\n\r"),
                     millis (), header.type, header.from_node);
   *most_recent_header = header;
-  // TODO: functionalize handlers
   switch (header.type)
   {
     case 'A':
-      network.read (header, &num_lines, sizeof (num_lines));
+      handle_alloc_message ();
       break;
     case 'L':
-      // TODO: increment buffer pointer per line read
-      network.read (header, &(buffer[current_line_num]),
-                    sizeof (blinkm_script_line));
-      current_line_num++;
+      handle_line_message ();
       break;
     case 'E':
-      current_line_num = 0;
-      network.read (header, NULL, 0);
+      handle_end_message ();
       break;
     default:
-      printf_P(PSTR("*** WARNING *** Unknown message type %c\n\r"),header.type);
-      network.read(header,0,0);
+      handle_unknown_message ();
       break;
   }
   return 1;
@@ -111,4 +110,31 @@ send_end_message (uint16_t to_node, uint16_t from_node)
     printf_P(PSTR("%lu: APP Send end message ok\n\r"), millis ());
   else
     printf_P(PSTR("%lu: APP Send end message failed\n\r"), millis ());
+}
+
+static inline void
+handle_alloc_message (void)
+{
+  network.read (header, &num_lines, sizeof (num_lines));
+}
+
+static inline void
+handle_line_message (void)
+{
+  network.read (header, &(buffer[current_line_num++]),
+                sizeof (blinkm_script_line));
+}
+
+static inline void
+handle_end_message (void)
+{
+  current_line_num = 0;
+  network.read (header, NULL, 0);
+}
+
+static inline void
+handle_unknown_message (void)
+{
+  printf_P (PSTR ("*** WARNING *** Unknown message type %c\n\r"), header.type);
+  network.read (header, 0, 0);
 }
