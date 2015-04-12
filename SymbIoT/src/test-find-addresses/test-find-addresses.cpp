@@ -68,10 +68,14 @@ void setup()
 void loop()
 {
   received = receive ();
-  
+
+  if (received)
+    printf_P (PSTR ("cmd>\r\n"));
+
   if (readSerialString ())
   {
     char cmd = serInStr[0];
+    bool ok;
     Serial.print ("\r\n");
     if (IS_DIGIT(cmd))
     {
@@ -82,13 +86,25 @@ void loop()
       switch (cmd)
       {
         case 't':
+        {
           int i;
+          int array_idx = 0;
           for (i = 0; i < max_active_nodes; i++)
           {
-            test_connection (possible_nodes[i], this_node, timeout);
+            ok = test_connection (possible_nodes[i], this_node, timeout);
+            if (ok)
+            {
+              active_nodes[array_idx++] = possible_nodes[i];
+            }
+          }
+          printf_P (PSTR ("Finished! Nodes on the network are:\r\n"));
+          for (i = 0; i < array_idx; i++)
+          {
+            printf_P (PSTR ("0%o\r\n"), active_nodes[i]);
           }
           Serial.print ("\r\ncmd>");
           break;
+        }
         case 'a':
           test_connection (possible_nodes[10], this_node, timeout);
           Serial.print ("\r\ncmd>");

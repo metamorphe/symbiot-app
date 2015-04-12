@@ -39,6 +39,6 @@ int receive ();
 /* Attempts to see if a specified to_node is on the network. Blocks
    until an acknowledge is received, or until a specified timeout is
    up. */
-void test_connection (uint16_t, uint16_t, unsigned long);
+int test_connection (uint16_t, uint16_t, unsigned long);
 
 #endif

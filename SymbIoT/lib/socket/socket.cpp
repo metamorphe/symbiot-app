@@ -89,7 +89,7 @@ send (uint16_t to_node, uint16_t from_node, blinkm_script_line *src,
   send_end_message (to_node, from_node);
 }
 
-void
+int
 test_connection (uint16_t to_node, uint16_t from_node, unsigned long timeout)
 {
   printf_P (PSTR ("%lu: APP Attempting to connect to node 0%o\r\n"),
@@ -101,12 +101,13 @@ test_connection (uint16_t to_node, uint16_t from_node, unsigned long timeout)
   {
     ok = receive();
     if (ok)
-      return;
+      return 1;
     delay (100);
   }
   printf_P (PSTR ("%lu: APP Timeout while trying to connect to node 0%o\r\n"),
                   millis (), to_node);
   printf_P (PSTR ("cmd>\r\n"));
+  return 0;
 }
 
 
@@ -157,9 +158,9 @@ send_discovery_message (uint16_t to_node, uint16_t from_node)
   char buf[4] = { 'D', 'I', 'S', '\0' };
   bool ok = network.write (header, &buf, sizeof(buf));
   if (ok)
-    printf_P(PSTR("%lu: APP Send discovery to %u message ok\n\r"), millis (), to_node);
+    printf_P(PSTR("%lu: APP Send discovery to 0%o message ok\n\r"), millis (), to_node);
   else
-    printf_P(PSTR("%lu: APP Send discovery to %u message failed\n\r"), millis (), to_node);
+    printf_P(PSTR("%lu: APP Send discovery to 0%o message failed\n\r"), millis (), to_node);
 }
 
 static void
@@ -211,7 +212,6 @@ handle_acknowledge_message (void)
   network.read (header, NULL, 0);
   printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
                   millis (), header.from_node);
-  printf_P (PSTR ("cmd>\r\n"));
 }
 
 static inline void
