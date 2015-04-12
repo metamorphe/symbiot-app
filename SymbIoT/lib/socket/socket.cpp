@@ -204,6 +204,7 @@ handle_discovery_message (void)
   printf_P (PSTR ("%lu: APP Received discovery message from 0%o. Sending ACK...\r\n"),
                   millis (), header.from_node);
   send_acknowledge_message (header.from_node, header.to_node);
+  command_self_flash_yellow ();
 }
 
 static inline void
