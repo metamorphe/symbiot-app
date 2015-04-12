@@ -11,7 +11,9 @@ RF24NetworkHeader header;
 RF24NetworkHeader *most_recent_header;
 uint8_t num_lines;
 static uint8_t current_line_num;
+uint16_t address_buffer;
 
+/* Functions for behavior transmission. */
 static void send_alloc_message (uint16_t, uint16_t, uint8_t);
 static void send_line_message (uint16_t, uint16_t, blinkm_script_line *);
 static void send_end_message (uint16_t, uint16_t);
@@ -19,6 +21,14 @@ static void send_end_message (uint16_t, uint16_t);
 static inline void handle_alloc_message (void);
 static inline void handle_line_message (void);
 static inline void handle_end_message (void);
+
+/* Functions for service discovery. */
+static void send_discovery_message (uint16_t, uint16_t);
+static void send_acknowledge_message (uint16_t, uint16_t);
+
+static inline void handle_discovery_message (void);
+static inline void handle_acknowledge_message (void);
+
 static inline void handle_unknown_message (void);
 
 int
@@ -38,7 +48,7 @@ receive()
     return 0;
 
   network.peek(header);
-  printf_P (PSTR ("APP Received message of type %c from % "PRIu16 "\n\r"),
+  printf_P (PSTR ("%lu: APP Received message of type %c from % "PRIu16 "\n\r"),
                     millis (), header.type, header.from_node);
   *most_recent_header = header;
   switch (header.type)
@@ -51,6 +61,12 @@ receive()
       break;
     case 'E':
       handle_end_message ();
+      break;
+    case 'C':
+      handle_acknowledge_message ();
+      break;
+    case 'D':
+      handle_discovery_message ();
       break;
     default:
       handle_unknown_message ();
@@ -73,6 +89,27 @@ send (uint16_t to_node, uint16_t from_node, blinkm_script_line *src,
   send_end_message (to_node, from_node);
 }
 
+void
+test_connection (uint16_t to_node, uint16_t from_node, unsigned long timeout)
+{
+  printf_P (PSTR ("%lu: APP Attempting to connect to node 0%o\r\n"),
+                millis (), to_node);
+  bool ok;
+  unsigned long start_time = millis ();
+  send_discovery_message (to_node, from_node);
+  while (millis () - start_time <= timeout)
+  {
+    ok = receive();
+    if (ok)
+      return;
+    delay (100);
+  }
+  printf_P (PSTR ("%lu: APP Timeout while trying to connect to node 0%o\r\n"),
+                  millis (), to_node);
+  printf_P (PSTR ("cmd>\r\n"));
+}
+
+
 static void
 send_alloc_message (uint16_t to_node, uint16_t from_node,
                     uint8_t num_lines)
@@ -88,7 +125,7 @@ send_alloc_message (uint16_t to_node, uint16_t from_node,
 }
 
 static void
-send_line_message(uint16_t to_node, uint16_t from_node,
+send_line_message (uint16_t to_node, uint16_t from_node,
                   blinkm_script_line *line)
 {
   RF24NetworkHeader header(to_node, 'L');
@@ -112,6 +149,31 @@ send_end_message (uint16_t to_node, uint16_t from_node)
     printf_P(PSTR("%lu: APP Send end message failed\n\r"), millis ());
 }
 
+static void
+send_discovery_message (uint16_t to_node, uint16_t from_node)
+{
+  RF24NetworkHeader header(to_node, 'D');
+  header.from_node = from_node;
+  char buf[4] = { 'D', 'I', 'S', '\0' };
+  bool ok = network.write (header, &buf, sizeof(buf));
+  if (ok)
+    printf_P(PSTR("%lu: APP Send discovery to %u message ok\n\r"), millis (), to_node);
+  else
+    printf_P(PSTR("%lu: APP Send discovery to %u message failed\n\r"), millis (), to_node);
+}
+
+static void
+send_acknowledge_message (uint16_t to_node, uint16_t from_node)
+{
+  RF24NetworkHeader header(to_node, 'C');
+  header.from_node = from_node;
+  bool ok = network.write (header, NULL, 0);
+  if (ok)
+    printf_P(PSTR("%lu: APP Send acknowledge message ok\n\r"), millis ());
+  else
+    printf_P(PSTR("%lu: APP Send acknowledge message failed\n\r"), millis ());
+}
+
 static inline void
 handle_alloc_message (void)
 {
@@ -130,6 +192,26 @@ handle_end_message (void)
 {
   current_line_num = 0;
   network.read (header, NULL, 0);
+}
+
+static inline void
+handle_discovery_message (void)
+{
+  char buf[4];
+  network.read (header, &buf, sizeof (buf));
+  printf_P (PSTR ("Discover debug: received massage %s.\r\n"), buf);
+  printf_P (PSTR ("%lu: APP Received discovery message from 0%o. Sending ACK...\r\n"),
+                  millis (), header.from_node);
+  send_acknowledge_message (header.from_node, header.to_node);
+}
+
+static inline void
+handle_acknowledge_message (void)
+{
+  network.read (header, NULL, 0);
+  printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
+                  millis (), header.from_node);
+  printf_P (PSTR ("cmd>\r\n"));
 }
 
 static inline void
