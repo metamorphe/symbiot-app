@@ -7,7 +7,7 @@ command_set_color (uint16_t to_node, uint16_t from_node,
                    uint8_t red_val, uint8_t green_val,
                    uint8_t blue_val)
 {
-  blinkm_script_line set_line = { 1, { 'n', red_val, blue_val, green_val} };
+  blinkm_script_line set_line = { 1, { 'n', red_val, green_val, blue_val} };
   send (to_node, from_node, &set_line, 1);
 }
 
@@ -37,7 +37,7 @@ command_fade_to_color (uint16_t to_node, uint16_t from_node,
                    uint8_t red_val, uint8_t green_val,
                    uint8_t blue_val)
 {
-  blinkm_script_line set_line = { 1, { 'c', red_val, blue_val, green_val} };
+  blinkm_script_line set_line = { 1, { 'c', red_val, green_val, blue_val} };
   send (to_node, from_node, &set_line, 1);
 }
 
@@ -68,9 +68,9 @@ command_self_flash_helper (uint8_t red_val, uint8_t green_val,
 {
   blinkm_script_line set_lines[] =
   {
-    { 10, { 'n', red_val, blue_val, green_val} },
+    { 10, { 'n', red_val, greeen, blue_val} },
     { 5, { 'n', 0x00, 0x00, 0x00} },
-    { 10, { 'n', red_val, blue_val, green_val} },
+    { 10, { 'n', red_val, greeen, blue_val} },
     { 5, { 'n', 0x00, 0x00, 0x00} }
   };
   BlinkM_writeScript (blinkm_addr, 0, 4, 0, set_lines);
