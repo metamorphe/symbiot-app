@@ -28,6 +28,7 @@ extern HardwareSPI SPI;
 #endif
 
 #undef SERIAL_DEBUG
+// #define SERIAL_DEBUG 1
 #ifdef SERIAL_DEBUG
 #define IF_SERIAL_DEBUG(x) ({x;})
 #else

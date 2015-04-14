@@ -3,7 +3,8 @@
 #define TIMEOUT 3000
 
 /* rF configuration */
-RF24 radio(9,10); 
+// RF24 radio(9,10); // Uncomment this if using default pin setup
+RF24 radio(A0, 10); // Uncomment this if using PCB board
 RF24Network network(radio);
 
 blinkm_script_line buffer[16];
@@ -48,8 +49,8 @@ receive()
     return 0;
 
   network.peek(header);
-  printf_P (PSTR ("%lu: APP Received message of type %c from % "PRIu16 "\n\r"),
-                    millis (), header.type, header.from_node);
+  // printf_P (PSTR ("%lu: APP Received message of type %c from % "PRIu16 "\n\r"),
+  //                   millis (), header.type, header.from_node);
   *most_recent_header = header;
   switch (header.type)
   {
@@ -157,10 +158,10 @@ send_discovery_message (uint16_t to_node, uint16_t from_node)
   header.from_node = from_node;
   char buf[4] = { 'D', 'I', 'S', '\0' };
   bool ok = network.write (header, &buf, sizeof(buf));
-  if (ok)
-    printf_P(PSTR("%lu: APP Send discovery to 0%o message ok\n\r"), millis (), to_node);
-  else
-    printf_P(PSTR("%lu: APP Send discovery to 0%o message failed\n\r"), millis (), to_node);
+  // if (ok)
+  //   printf_P(PSTR("%lu: APP Send discovery to 0%o message ok\n\r"), millis (), to_node);
+  // else
+  //   printf_P(PSTR("%lu: APP Send discovery to 0%o message failed\n\r"), millis (), to_node);
 }
 
 static void
@@ -169,10 +170,10 @@ send_acknowledge_message (uint16_t to_node, uint16_t from_node)
   RF24NetworkHeader header(to_node, 'C');
   header.from_node = from_node;
   bool ok = network.write (header, NULL, 0);
-  if (ok)
-    printf_P(PSTR("%lu: APP Send acknowledge message ok\n\r"), millis ());
-  else
-    printf_P(PSTR("%lu: APP Send acknowledge message failed\n\r"), millis ());
+  // if (ok)
+  //   printf_P(PSTR("%lu: APP Send acknowledge message ok\n\r"), millis ());
+  // else
+  //   printf_P(PSTR("%lu: APP Send acknowledge message failed\n\r"), millis ());
 }
 
 static inline void
@@ -200,9 +201,9 @@ handle_discovery_message (void)
 {
   char buf[4];
   network.read (header, &buf, sizeof (buf));
-  printf_P (PSTR ("Discover debug: received massage %s.\r\n"), buf);
-  printf_P (PSTR ("%lu: APP Received discovery message from 0%o. Sending ACK...\r\n"),
-                  millis (), header.from_node);
+  // printf_P (PSTR ("Discover debug: received massage %s.\r\n"), buf);
+  // printf_P (PSTR ("%lu: APP Received discovery message from 0%o. Sending ACK...\r\n"),
+  //                 millis (), header.from_node);
   send_acknowledge_message (header.from_node, header.to_node);
   command_self_flash_yellow ();
 }
@@ -211,8 +212,8 @@ static inline void
 handle_acknowledge_message (void)
 {
   network.read (header, NULL, 0);
-  printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
-                  millis (), header.from_node);
+  // printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
+  //                 millis (), header.from_node);
 }
 
 static inline void

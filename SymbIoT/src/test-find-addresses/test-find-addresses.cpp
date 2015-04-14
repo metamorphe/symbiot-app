@@ -34,7 +34,7 @@ const int timeout = 3000;
 void 
 welcome_message(void)
 {
-  printf_P (PSTR ("Welcome to address-finder test suite.\r\n"));
+  printf_P (PSTR ("\r\nWelcome to address-finder test suite.\r\n"));
   printf_P (PSTR ("This node's id is 0%o.\r\n\r\n"), this_node);
 }
 
@@ -51,16 +51,18 @@ void setup()
   /* Begin all communication, read EEPROM, and print address. */
   Serial.begin (19200);
   printf_begin ();
-  help ();
   this_node = nodeconfig_read ();
   welcome_message ();
+  help ();
 
   /* BlinkM overhead */
   setup_blinkM ();
   BlinkM_setStartupParamsDefault (blinkm_addr);
-  // BlinkM_stopScript( blinkm_addr );
-  // BlinkM_fadeToRGB (blinkm_addr, 0, 0, 0);
+  command_self_flash_green ();
 
+  /* Radio overhead */
+  pinMode(A0, OUTPUT); // !!! only enable this if on PCB board, make sure radio is initialized
+                       // as RF24(A0, 10) also !!! 
   setup_radio (this_node);
   Serial.print("cmd>");
 }
