@@ -14,6 +14,10 @@ void welcome_message(void);
 uint8_t readSerialString (void);
 void actuate (void);
 
+void serial_actuate (void);
+void all_on (void);
+void all_off (void);
+
 uint16_t this_node;
 int received;
 char serInStr[SERIAL_BUFFER_SIZE];
@@ -36,6 +40,9 @@ help (void)
    "'o' to stop script playback\r\n"
    "'x' to fade to black\r\n"
    "'f' to flash red\r\n"
+   "'a' for a serial show\r\n"
+   "'b' for an all-on effect\r\n" 
+   "'c' for an all-off effect\r\n" 
    ); 
 }
 
@@ -138,6 +145,39 @@ actuate (void)
                       (blinkm_script_line *) buffer);
   BlinkM_playScript (blinkm_addr, 0, 1,0);
 }
+
+// void
+// serial_actuate (void)
+// {
+//   test_connection ((uint16_t) 01, this_node, 3000);
+//   test_connection ((uint16_t) 011, this_node, 3000);
+//   test_connection ((uint16_t) 02, this_node, 3000);
+//   test_connection ((uint16_t) 03, this_node, 3000);
+//   test_connection ((uint16_t) 04, this_node, 3000);
+//   test_connection ((uint16_t) 05, this_node, 3000);
+// }
+
+// void
+// all_on (void)
+// {
+//   command_set_intensity ((uint16_t) 01, this_node, 100);
+//   command_set_intensity ((uint16_t) 011, this_node, 100);
+//   command_set_intensity ((uint16_t) 02, this_node, 100);
+//   command_set_intensity ((uint16_t) 03, this_node, 100);
+//   command_set_intensity ((uint16_t) 04, this_node, 100);
+//   command_set_intensity ((uint16_t) 05, this_node, 100);
+// }
+
+// void
+// all_off (void)
+// {
+//   command_set_intensity ((uint16_t) 01, this_node, 0);
+//   command_set_intensity ((uint16_t) 011, this_node, 0);
+//   command_set_intensity ((uint16_t) 02, this_node, 0);
+//   command_set_intensity ((uint16_t) 03, this_node, 0);
+//   command_set_intensity ((uint16_t) 04, this_node, 0);
+//   command_set_intensity ((uint16_t) 05, this_node, 0);
+// }
 
 uint8_t
 readSerialString (void)

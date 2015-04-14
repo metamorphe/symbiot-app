@@ -80,8 +80,8 @@ void
 send (uint16_t to_node, uint16_t from_node, blinkm_script_line *src,
       uint8_t num_lines)
 {
-  printf_P(PSTR("%lu: APP Begin message from %" PRIu16 " to %" PRIu16 ".\n\r"),
-                millis (), from_node, to_node);
+  // printf_P(PSTR("%lu: APP Begin message from %" PRIu16 " to %" PRIu16 ".\n\r"),
+  //               millis (), from_node, to_node);
   send_alloc_message (to_node, from_node, num_lines);
   for (int i = 0; i < num_lines; i++)
   {
@@ -107,7 +107,6 @@ test_connection (uint16_t to_node, uint16_t from_node, unsigned long timeout)
   }
   printf_P (PSTR ("%lu: APP Timeout while trying to connect to node 0%o\r\n"),
                   millis (), to_node);
-  printf_P (PSTR ("cmd>\r\n"));
   return 0;
 }
 
@@ -120,10 +119,10 @@ send_alloc_message (uint16_t to_node, uint16_t from_node,
   header.from_node = from_node;
   uint8_t _num_lines = num_lines;
   bool ok = network.write (header, &_num_lines, sizeof (_num_lines));
-  if (ok)
-    printf_P(PSTR("%lu: APP Send alloc message ok\n\r"), millis ());
-  else
-    printf_P(PSTR("%lu: APP Send alloc message failed\n\r"), millis ());
+  // if (ok)
+  //   printf_P(PSTR("%lu: APP Send alloc message ok\n\r"), millis ());
+  // else
+  //   printf_P(PSTR("%lu: APP Send alloc message failed\n\r"), millis ());
 }
 
 static void
@@ -133,10 +132,10 @@ send_line_message (uint16_t to_node, uint16_t from_node,
   RF24NetworkHeader header(to_node, 'L');
   header.from_node = from_node;
   bool ok = network.write (header, line, sizeof (*line));
-  if (ok)
-    printf_P(PSTR("%lu: APP Send line message ok\n\r"), millis());
-  else
-    printf_P(PSTR("%lu: APP Send line message failed\n\r"), millis());
+  // if (ok)
+  //   printf_P(PSTR("%lu: APP Send line message ok\n\r"), millis());
+  // else
+  //   printf_P(PSTR("%lu: APP Send line message failed\n\r"), millis());
 }
 
 static void
@@ -145,10 +144,10 @@ send_end_message (uint16_t to_node, uint16_t from_node)
   RF24NetworkHeader header(to_node, 'E');
   header.from_node = from_node;
   bool ok = network.write (header, NULL, 0);
-  if (ok)
-    printf_P(PSTR("%lu: APP Send end message ok\n\r"), millis ());
-  else
-    printf_P(PSTR("%lu: APP Send end message failed\n\r"), millis ());
+  // if (ok)
+  //   printf_P(PSTR("%lu: APP Send end message ok\n\r"), millis ());
+  // else
+  //   printf_P(PSTR("%lu: APP Send end message failed\n\r"), millis ());
 }
 
 static void
@@ -219,6 +218,6 @@ handle_acknowledge_message (void)
 static inline void
 handle_unknown_message (void)
 {
-  printf_P (PSTR ("*** WARNING *** Unknown message type %c\n\r"), header.type);
+  // printf_P (PSTR ("*** WARNING *** Unknown message type %c\n\r"), header.type);
   network.read (header, 0, 0);
 }

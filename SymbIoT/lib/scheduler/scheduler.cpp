@@ -59,9 +59,9 @@ void scheduler_process(String keyData, String valueData, uint16_t this_node){
     int board = key / 16;
     int addr = key % 16;
     Serial.print("Sending to ");
-    Serial.print(addr);
-    Serial.print(" with value ");
-    Serial.println(value);
+    // Serial.print(addr);
+    // Serial.print(" with value ");
+    // Serial.println(value);
 
     /* Send to network */
     command_set_intensity ((uint16_t) addr, this_node, value);
