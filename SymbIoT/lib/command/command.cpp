@@ -77,6 +77,18 @@ command_self_flash_helper (uint8_t red_val, uint8_t green_val,
   BlinkM_playScript (blinkm_addr, 0,1,0 );
 }
 
+static void
+command_self_set_helper (uint8_t red_val, uint8_t green_val,
+                           uint8_t blue_val)
+{
+  blinkm_script_line set_lines[] =
+  {
+    { 10, { 'n', red_val, green_val, blue_val} }
+  };
+  BlinkM_writeScript (blinkm_addr, 0, 4, 0, set_lines);
+  BlinkM_playScript (blinkm_addr, 0,1,0 );
+}
+
 void command_self_flash_red (void)
 {
   command_self_flash_helper (0xff, 0x00, 0x00);
@@ -100,4 +112,14 @@ void command_self_flash_yellow (void)
 void command_self_flash_white (void)
 {
   command_self_flash_helper (0xff, 0xff, 0xff);
+}
+
+void command_self_set_on (void)
+{
+  command_self_set_helper (0xff, 0xff, 0xff);
+}
+
+void command_self_set_off (void)
+{
+  command_self_set_helper (0x00, 0x00, 0x00);
 }

@@ -30,6 +30,13 @@ static void send_acknowledge_message (uint16_t, uint16_t);
 static inline void handle_discovery_message (void);
 static inline void handle_acknowledge_message (void);
 
+/* Hard coding fun! */
+void send_on_message (uint16_t, uint16_t);
+void send_off_message (uint16_t, uint16_t);
+
+void handle_on_message (void);
+void handle_off_message (void);
+
 static inline void handle_unknown_message (void);
 
 int
@@ -54,6 +61,12 @@ receive()
   *most_recent_header = header;
   switch (header.type)
   {
+    case 'N':
+      handle_on_message ();
+      break;
+    case 'F':
+      handle_off_message ();
+      break;
     case 'A':
       handle_alloc_message ();
       break;
@@ -220,4 +233,32 @@ handle_unknown_message (void)
 {
   // printf_P (PSTR ("*** WARNING *** Unknown message type %c\n\r"), header.type);
   network.read (header, 0, 0);
+}
+
+/* Hard coding fun time */
+
+void send_on_message (uint16_t to_node, uint16_t from_node)
+{
+  RF24NetworkHeader header(to_node, 'N');
+  header.from_node = from_node;
+  bool ok = network.write (header, NULL, 0);
+}
+
+void send_off_message (uint16_t to_node, uint16_t from_node)
+{
+  RF24NetworkHeader header(to_node, 'F');
+  header.from_node = from_node;
+  bool ok = network.write (header, NULL, 0);
+}
+
+void handle_on_message (void)
+{
+  network.read (header, NULL, 0);
+  command_self_set_on ();
+}
+
+void handle_off_message (void)
+{
+  network.read (header, NULL, 0);
+  command_self_set_off ();
 }

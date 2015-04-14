@@ -43,4 +43,8 @@ int receive ();
    up. */
 int test_connection (uint16_t, uint16_t, unsigned long);
 
+/* Hard coding */
+void send_on_message (uint16_t, uint16_t);
+void send_off_message (uint16_t, uint16_t);
+
 #endif

@@ -192,8 +192,8 @@ bool RF24Network::write(RF24NetworkHeader& header,const void* message, size_t le
 {
   // printf_P(PSTR("%lu: WRITE Begin message from %" PRIu16 " to %" PRIu16 " message is % "PRIu8 ".\n\r"),
   //             millis (), header.from_node, header.to_node, *((uint8_t *) message));
-  printf_P(PSTR("%lu: WRITE Begin message from 0%o to 0%o message is % "PRIu8 ".\n\r"),
-            millis (), header.from_node, header.to_node, *((uint8_t *) message));
+  // printf_P(PSTR("%lu: WRITE Begin message from 0%o to 0%o message is % "PRIu8 ".\n\r"),
+  //           millis (), header.from_node, header.to_node, *((uint8_t *) message));
   // Fill out the header
   header.from_node = node_address;
 
