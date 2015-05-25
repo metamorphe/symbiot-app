@@ -15,6 +15,7 @@ uint8_t readSerialString (void);
 void actuate (void);
 
 void serial_actuate (void);
+void back_serial_actuate (void);
 void all_on (void);
 void all_off (void);
 
@@ -38,11 +39,12 @@ help (void)
    "'p' to write the script and play once\r\n"
    "'<node address>' to send the script to a specified node\r\n"
    "'o' to stop script playback\r\n"
-   "'x' to fade to black\r\n"
+   "'q' to fade to black\r\n"
    "'f' to flash red\r\n"
-   "'a' for a serial show\r\n"
-   "'b' for an all-on effect\r\n" 
-   "'c' for an all-off effect\r\n" 
+   "'u' for a serial show\r\n"
+   "'v' for a backwards serial show\r\n"
+   "'w' for an all-on effect\r\n" 
+   "'x' for an all-off effect\r\n" 
    ); 
 }
 
@@ -80,6 +82,14 @@ void loop()
   {
     char cmd = serInStr[0];
     Serial.print ("\r\n");
+    if (cmd == 'u')
+      serial_actuate ();
+    else if (cmd == 'v')
+      back_serial_actuate ();
+    else if (cmd == 'w')
+      all_on ();
+    else if (cmd == 'x')
+      all_off ();
 
     if ( cmd == 'p' )
     {
@@ -104,7 +114,7 @@ void loop()
       BlinkM_stopScript( blinkm_addr );
       Serial.print("\r\ncmd>");
     }
-    else if( cmd =='x' )
+    else if( cmd =='q' )
     {
       Serial.println ("Fade to black");
       BlinkM_fadeToRGB (blinkm_addr, 0, 0, 0);
@@ -146,38 +156,50 @@ actuate (void)
   BlinkM_playScript (blinkm_addr, 0, 1,0);
 }
 
-// void
-// serial_actuate (void)
-// {
-//   test_connection ((uint16_t) 01, this_node, 3000);
-//   test_connection ((uint16_t) 011, this_node, 3000);
-//   test_connection ((uint16_t) 02, this_node, 3000);
-//   test_connection ((uint16_t) 03, this_node, 3000);
-//   test_connection ((uint16_t) 04, this_node, 3000);
-//   test_connection ((uint16_t) 05, this_node, 3000);
-// }
+void
+serial_actuate (void)
+{
+  bool ok;
+  int i;
+  uint16_t nodes[6] = { 01, 011, 02, 03, 04, 05 };
+  for (i = 0; i < 6; i++)
+  {
+    ok = test_connection (nodes[i], this_node, 3000);
+  }
+}
 
-// void
-// all_on (void)
-// {
-//   command_set_intensity ((uint16_t) 01, this_node, 100);
-//   command_set_intensity ((uint16_t) 011, this_node, 100);
-//   command_set_intensity ((uint16_t) 02, this_node, 100);
-//   command_set_intensity ((uint16_t) 03, this_node, 100);
-//   command_set_intensity ((uint16_t) 04, this_node, 100);
-//   command_set_intensity ((uint16_t) 05, this_node, 100);
-// }
+void
+back_serial_actuate (void)
+{
+  test_connection ((uint16_t) 05, this_node, 3000);
+  test_connection ((uint16_t) 04, this_node, 3000);
+  test_connection ((uint16_t) 03, this_node, 3000);
+  test_connection ((uint16_t) 02, this_node, 3000);
+  test_connection ((uint16_t) 011, this_node, 3000);
+  test_connection ((uint16_t) 01, this_node, 3000);
+}
 
-// void
-// all_off (void)
-// {
-//   command_set_intensity ((uint16_t) 01, this_node, 0);
-//   command_set_intensity ((uint16_t) 011, this_node, 0);
-//   command_set_intensity ((uint16_t) 02, this_node, 0);
-//   command_set_intensity ((uint16_t) 03, this_node, 0);
-//   command_set_intensity ((uint16_t) 04, this_node, 0);
-//   command_set_intensity ((uint16_t) 05, this_node, 0);
-// }
+void
+all_on (void)
+{
+  send_on_message ((uint16_t) 05, this_node);
+  send_on_message ((uint16_t) 04, this_node);
+  send_on_message ((uint16_t) 03, this_node);
+  send_on_message ((uint16_t) 02, this_node);
+  send_on_message ((uint16_t) 011, this_node);
+  send_on_message ((uint16_t) 01, this_node);
+}
+
+void
+all_off (void)
+{
+  send_off_message ((uint16_t) 05, this_node);
+  send_off_message ((uint16_t) 04, this_node);
+  send_off_message ((uint16_t) 03, this_node);
+  send_off_message ((uint16_t) 02, this_node);
+  send_off_message ((uint16_t) 011, this_node);
+  send_off_message ((uint16_t) 01, this_node);
+}
 
 uint8_t
 readSerialString (void)
