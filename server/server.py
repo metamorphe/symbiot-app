@@ -1,5 +1,6 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from SocketServer import ThreadingMixIn
+from urlparse import urlparse
 import threading
 import argparse
 import re
@@ -14,81 +15,94 @@ class LocalData(object):
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
 
-    def do_POST(self):
-        if re.search('/devices', self.path):
-            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-            print "ctype is: ", ctype
-            if ctype == 'application/json':
-                LocalData.records[LocalData.last_id] = 0
-                print "Device with ID: %s added successfully" % LocalData.last_id
-                LocalData.last_id += 1
-            self.send_response(200)
-            self.end_headers()
-        else:
-            self.send_response(403)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-
     def do_GET(self):
+        """
+        Handles a GET request. Cases:
+
+        GET /devices/ : returns the list of active nodes, each with its
+                       current brightness value.
+
+        GET /devices/<ID> : returns the current brightness value of ID.
+        """
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        if ctype != 'application/json':
+            send_response(400, 'Bad Request: request not in JSON format.')
+
+        # Case: return ID's brightness value
         if re.search('/devices/\d', self.path):
-            recordID = self.path.split('/')[-1]
+            recordID = int(self.path.split('/')[-1])
             if LocalData.records.has_key(recordID):
                 self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
                 self.wfile.write(LocalData.records[recordID])
             else:
-                self.send_response(400, 'Bad Request: record does not exist in ' + str(LocalData.records))
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
+                self.send_response(403, 'Error: record does not exist in ' + str(LocalData.records))
+
+        # Case: list of nodes
         elif re.search('/devices', self.path):
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
+            self.send_response_with_headers(200)
             self.wfile.write(json.dumps(LocalData.records))
+
         else:
-            self.send_response(403)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
+            self.send_response_with_headers(400, 'Error: invalid URL.')
 
     def do_PUT(self):
+        """
+        Handles a PUT request. Cases:
+
+        PUT /devices/<ID> : creates a node with id ID. Currently, nodes
+                           are stored on the server as key-value pairs
+                           with ID as a key and VALUE as a value. Note
+                           that, currently PUT requests create new
+                           nodes and not POST requests.
+
+        PUT /devices/<ID>/<VALUE> : sets the brightness of the node ID
+                                   to VALUE. Error if VALUE is not from
+                                   0 to 100 or if ID has not yet been
+                                   put in the server.
+
+        """
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        if ctype != 'application/json':
+            send_response(400, 'Bad Request: request not in JSON format.')
+
+        # Case: set VALUE to ID
         if re.search('/devices/\d/\d', self.path):
-            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-            print "ctype is: ", ctype
-            if ctype == 'application/json':
-                recordID = int(self.path.split('/')[-2])
-                value = int(self.path.split('/')[-1])
-                print "Got PUT request with id: %d and value: %d" % (recordID, value)
-                try:
-                    # send_state(recordID, value)
-                    LocalData.arduino.actuate(recordID, value)
-                    LocalData.records[recordID] = value
-                    print "Value is: %s" % value
-                except KeyError:
-                    print "Error: no record with id: %d" % recordID
+            recordID = int(self.path.split('/')[-2])
+            value = int(self.path.split('/')[-1])
+            print "Got PUT request with id: %d and value: %d" % (recordID, value)
+            try:
+                LocalData.arduino.actuate(recordID, value)
+                LocalData.records[recordID] = value
+                print "Value is: %s" % value
+                self.send_response_with_headers(200)
+            except KeyError:
+                print "Error: no record with id: %d" % recordID
+                self.send_response_with_headers(400, 'Error: no record with id %'                                                      % recordID)
+        
+        # Case: create ID
+        elif re.search('/devices/\d', self.path):
+            recordID = int(self.path.split('/')[-1])
+            print "Got PUT request with id: %d" % recordID
+            LocalData.records[recordID] = 0
+            self.send_response(200)
+
+        else:
+            self.send_response_with_headers(400, 'Error: invalid URL.')
 
     def do_DELETE(self):
         print 'DELETE: not yet implemented'
 
-class HandlerUtil(object):
-
-    def make_device_list(records):
+    def send_response_with_headers(self, code, message=None):
         """
-        Takes a dictionary RECORDS whose entries have the form:
-
-        "<ID>" : 
+        Utility function for sending responses from the server.
+        
+        Arguments:
+        CODE : The HTTP response code number, e.g. 200, 404
+        MESSAGE : A string representing the HTML reponse body.
         """
-        pass
-
-    def send_state(id, value):
-        """
-        Builds a command of the form:
-
-        s<ID>,<VALUE>
-
-        To send to serial. TODO: return boolean confirmation
-        """
-        pass
+        self.send_response(code, message)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     allow_reuse_address = True
