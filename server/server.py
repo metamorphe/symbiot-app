@@ -32,10 +32,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if re.search('/devices/\d', self.path):
             recordID = int(self.path.split('/')[-1])
             if LocalData.records.has_key(recordID):
-                self.send_response(200)
+                self.send_response_with_headers(200)
                 self.wfile.write(LocalData.records[recordID])
             else:
-                self.send_response(403, 'Error: record does not exist in ' + str(LocalData.records))
+                self.send_response_with_headers(403, 'Error: record does not exist in ' + str(LocalData.records))
 
         # Case: list of nodes
         elif re.search('/devices', self.path):
@@ -90,7 +90,19 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response_with_headers(400, 'Error: invalid URL.')
 
     def do_DELETE(self):
-        print 'DELETE: not yet implemented'
+        """
+        Handles a DELETE request. Cases:
+
+        /devices/<ID> : deletes the node with ID. Error if a node with
+                        ID does not exist.
+        """
+        # Case: delete ID
+        if re.search('/devices/\d', self.path):
+            recordID = int(self.path.split('/')[-1])
+            try:
+                LocalData.records.pop(recordID, None)
+            except KeyError:
+                self.send_response_with_headers(403, 'Error: record does not exist in ' + str(LocalData.records))
 
     def send_response_with_headers(self, code, message=None):
         """
