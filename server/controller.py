@@ -10,7 +10,7 @@ class ArduinoSerialConnection:
 
         print "Connecting on port ", avail_ports[0]
         self.ser = serial.Serial(avail_ports[0], 19200, serial.EIGHTBITS, \
-                                 serial.PARITY_NONE, serial.STOPBITS_ONE, 2)
+                                 serial.PARITY_NONE, serial.STOPBITS_ONE, 0.5)
         self.connected = self.ser._isOpen
         # Flush closed and open
         self.close()
