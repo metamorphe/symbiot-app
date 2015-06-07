@@ -1,13 +1,27 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Node Control</title>
     <link href="css/style.css" rel="stylesheet"/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script src="./js/entry.js"></script>
+
     <script src="./js/main.js"></script>
   </head>
   <body>
-    <div class="container"></div>
+    <div class="container">
+      <div class="form-group">
+          <label for="newNodeId">New Node ID</label>
+          <input type="number" class="form-control" id="newNodeId" placeholder="Enter the new node's ID">
+          <button type="button" class="btn btn-default">Create</button>
+      </div>
+  </div>
   </body>
 </html>
