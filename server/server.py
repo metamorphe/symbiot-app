@@ -24,9 +24,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
         GET /devices/<ID> : returns the current brightness value of ID.
         """
-        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        if ctype != 'application/json':
-            send_response(400, 'Bad Request: request not in JSON format.')
+        print str(self.path)
+        #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        #if ctype != 'application/json':
+        #    send_response(400, 'Bad Request: request not in JSON format.')
 
         # Case: return ID's brightness value
         if re.search('/devices/\d', self.path):
@@ -61,9 +62,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                                    put in the server.
 
         """
-        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        if ctype != 'application/json':
-            send_response(400, 'Bad Request: request not in JSON format.')
+        #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        #if ctype != 'application/json':
+        #    send_response(400, 'Bad Request: request not in JSON format.')
 
         # Case: set VALUE to ID
         if re.search('/devices/\d/\d', self.path):
@@ -74,7 +75,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                 LocalData.arduino.actuate(recordID, value)
                 LocalData.records[recordID] = value
                 print "Value is: %s" % value
-                self.send_response_with_headers(200)
+                if value < 0 or value > 100:
+                    self.send_response_with_headers(400, 'Error: invalid value %'
+                                                        % value);
+                else:
+                    self.send_response_with_headers(200)
             except KeyError:
                 print "Error: no record with id: %d" % recordID
                 self.send_response_with_headers(400, 'Error: no record with id %'                                                      % recordID)
@@ -84,7 +89,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             recordID = int(self.path.split('/')[-1])
             print "Got PUT request with id: %d" % recordID
             LocalData.records[recordID] = 0
-            self.send_response(200)
+            self.send_response_with_headers(200)
 
         else:
             self.send_response_with_headers(400, 'Error: invalid URL.')
@@ -114,6 +119,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         """
         self.send_response(code, message)
         self.send_header('Content-Type', 'application/json')
+        self.send_header("Access-Control-Allow-Origin","*")
+        self.send_header("Access-Control-Expose-Headers", "Access-Control-Allow-Origin")
+        self.send_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
         self.end_headers()
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
