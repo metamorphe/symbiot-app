@@ -25,11 +25,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         GET /devices/<ID> : returns the current brightness value of ID.
         """
         print str(self.path)
-        #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        #if ctype != 'application/json':
-        #    send_response(400, 'Bad Request: request not in JSON format.')
-
-        # Case: return ID's brightness value
         if re.search('/devices/\d', self.path):
             recordID = int(self.path.split('/')[-1])
             if LocalData.records.has_key(recordID):
@@ -46,31 +41,27 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         else:
             self.send_response_with_headers(400, 'Error: invalid URL.')
 
-    def do_PUT(self):
+    def do_POST(self):
         """
-        Handles a PUT request. Cases:
+        Handles a POST request. Cases:
 
-        PUT /devices/<ID> : creates a node with id ID. Currently, nodes
+        POST /devices/<ID> : creates a node with id ID. Currently, nodes
                            are stored on the server as key-value pairs
                            with ID as a key and VALUE as a value. Note
-                           that, currently PUT requests create new
+                           that, currently POST requests create new
                            nodes and not POST requests.
 
-        PUT /devices/<ID>/<VALUE> : sets the brightness of the node ID
+        POST /devices/<ID>/<VALUE> : sets the brightness of the node ID
                                    to VALUE. Error if VALUE is not from
                                    0 to 100 or if ID has not yet been
                                    put in the server.
 
         """
-        #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        #if ctype != 'application/json':
-        #    send_response(400, 'Bad Request: request not in JSON format.')
-
         # Case: set VALUE to ID
         if re.search('/devices/\d/\d', self.path):
             recordID = int(self.path.split('/')[-2])
             value = int(self.path.split('/')[-1])
-            print "Got PUT request with id: %d and value: %d" % (recordID, value)
+            print "Got POST request with id: %d and value: %d" % (recordID, value)
             try:
                 LocalData.arduino.actuate(recordID, value)
                 LocalData.records[recordID] = value
@@ -87,7 +78,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         # Case: create ID
         elif re.search('/devices/\d', self.path):
             recordID = int(self.path.split('/')[-1])
-            print "Got PUT request with id: %d" % recordID
+            print "Got POST request with id: %d" % recordID
             LocalData.records[recordID] = 0
             self.send_response_with_headers(200)
 
