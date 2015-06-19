@@ -29,7 +29,7 @@ Entry.prototype = {
         var that = this;
         this.sendBtnDom.click(function(e) {
             e.preventDefault();
-            that.setBrightness(that.valueDom.child().val());
+            that.setBrightness(that.valueDom.children().val());
         });
         this.refreshBtnDom.click(function(e) {
             e.preventDefault();
@@ -42,8 +42,8 @@ Entry.prototype = {
     setBrightness: function(brightness) {
         var that = this;
         jQuery.ajax({
-            method: "PUT",
-            url: HOSTNAME + "/devices/" + this.id + "/" + this.brightness,
+            method: "POST",
+            url: HOSTNAME + "/devices/" + this.id + "/" + brightness,
             dataType: "json",
             crossDomain: true
         })
@@ -86,24 +86,25 @@ EntryList.prototype = {
         this.rootDom = $('<div class="entry-list"></div>').appendTo(this.PARENT_DOM);
     },
     addEntry: function(id) {
-        if (id < 0 || id > this.MAX_ID) {
+        if (!id || id < 0 || id > this.MAX_ID) {
             alert("Error: invalid id");
         } else if (id in this.hash) {
             alert("Error: an entry with this id already exists.");
         } else {
             var that = this;
             jQuery.ajax({
-                method: "PUT",
-                url: HOSTNAME + "/devices/" + this.id, 
+                method: "POST",
+                url: HOSTNAME + "/devices/" + id, 
                 dataType: "json",
                 crossDomain: true
+            })
+            .done(function(data, textStatus, jqXHR) {
+                that.hash[id] = new Entry(id, 0, that.rootDom);
+                that.hash[id].init();
             })
             .fail(function(data, textStatus, jqXHR) {
                 alert(textStatus);
             });
-
-            this.hash[id] = new Entry(id, 0, this.rootDom);
-            this.hash[id].init();
         }
     },
     deleteEntry: function(id) {
@@ -114,6 +115,9 @@ EntryList.prototype = {
             this.hash[id].destroy();
             delete this.hash[id]
         }
+    },
+    fetchServerList: function() {
+        //TODO: GET request from server to populate client list
     }
 }
 
@@ -139,9 +143,16 @@ EntryManager.prototype = {
         var that = this;
         this.createBtnDom.click(function(e) {
             ENTRY_LIST.addEntry(that.inputDom.val());
+            that.inputDom.val("");
         });
         this.deleteBtnDom.click(function(e) {
             ENTRY_LIST.deleteEntry(that.inputDom.val());
+        });
+    },
+    synchronizeViewWithList: function() {
+        var that = this;
+        ENTRY_LIST.forEach(function(v, i, a) {
+            v.init();
         });
     }
 }
