@@ -1,6 +1,15 @@
+/* 
+ * main.js 
+ *
+ * Documentation coming soon.
+ *
+ */
+
 function Entry(id, brightness, parentDom) {
     this.id = id || 0;
     this.brightness = brightness || 0;
+    this.MIN_BRIGHTNESS = 0;
+    this.MAX_BRIGHTNESS = 100;
     this.parentDom = parentDom;
     this.rootDom = null;
     this.entryTopDom = null;
@@ -40,6 +49,12 @@ Entry.prototype = {
         this.rootDom.remove();
     },
     setBrightness: function(brightness) {
+        brightness = Math.round(brightness);
+        if (isNaN(brightness) || brightness < this.MIN_BRIGHTNESS
+            || brightness > this.MAX_BRIGHTNESS) {
+            alert("Error: brightness must be an integer between "
+                    + this.MIN_BRIGHTNESS + " and " + this.MAX_BRIGHTNESS);
+        }
         var that = this;
         jQuery.ajax({
             method: "POST",
@@ -50,6 +65,7 @@ Entry.prototype = {
         .done(function(data, textStatus, jqXHR) {
             that.brightness = brightness;
             that.brightnessDom.text("Brightness: " + brightness);
+            that.valueDom.children().val("");
         })
         .fail(function(data, textStatus, jqXHR) {
             alert(textStatus);
@@ -86,6 +102,7 @@ EntryList.prototype = {
         this.rootDom = $('<div class="entry-list"></div>').appendTo(this.PARENT_DOM);
     },
     addEntry: function(id) {
+        id = Math.round(id);
         if (!id || id < 0 || id > this.MAX_ID) {
             alert("Error: invalid id");
         } else if (id in this.hash) {
@@ -117,7 +134,26 @@ EntryList.prototype = {
         }
     },
     fetchServerList: function() {
-        //TODO: GET request from server to populate client list
+        var that = this;
+        jQuery.ajax({
+            method: "GET",
+            url: "http://localhost:8000/devices/",
+            dataType: "json",
+            crossDomain: true
+        })
+        .done(function(data, textStatus, jqXHR) {
+            var deviceHash = jqXHR.responseJSON;
+            var newEntry;
+            jQuery.each(deviceHash, function(id, brightness) {
+                if (!that.hash[id]) {
+                    that.hash[id] = new Entry(id, brightness, that.rootDom);
+                    that.hash[id].init();
+                }
+            });
+        })
+        .fail(function(data, textStatus, jqXHR) {
+            alert("Error: could not refresh");
+        });
     }
 }
 
@@ -135,8 +171,10 @@ EntryManager.prototype = {
         this.rootDom = $('<div class="form-group"></div>').appendTo(this.PARENT_DOM);
         this.labelDom = $('<label for="newNodeId">New Node ID</label>').appendTo(this.rootDom);
         this.inputDom = $('<input type="number" class="form-control" id="newNodeId" placeholder="Enter the new node\'s ID">').appendTo(this.rootDom);
-        this.createBtnDom =  $('<button type="button" class="create-btn btn btn-success">Create</button>').appendTo(this.rootDom);
-        this.deleteBtnDom =  $('<button type="button" class="delte-btn btn btn-danger">Delete</button>').appendTo(this.rootDom);
+        this.buttonGroupDom = $('<div class="btn-group" role="group"></div>').appendTo(this.rootDom);
+        this.createBtnDom =  $('<button type="button" class="create-btn btn btn-success">Create</button>').appendTo(this.buttonGroupDom);
+        this.deleteBtnDom =  $('<button type="button" class="delete-btn btn btn-danger">Delete</button>').appendTo(this.buttonGroupDom);
+        this.refreshBtnDom =  $('<button type="button" class="refresh-btn btn btn-info">Refresh List</button>').appendTo(this.buttonGroupDom);
         this._setListeners();
     },
     _setListeners: function() {
@@ -148,11 +186,8 @@ EntryManager.prototype = {
         this.deleteBtnDom.click(function(e) {
             ENTRY_LIST.deleteEntry(that.inputDom.val());
         });
-    },
-    synchronizeViewWithList: function() {
-        var that = this;
-        ENTRY_LIST.forEach(function(v, i, a) {
-            v.init();
+        this.refreshBtnDom.click(function(e) {
+            ENTRY_LIST.fetchServerList();
         });
     }
 }
@@ -169,5 +204,6 @@ $(document).ready(function() {
     ENTRY_MANAGER.init();
     ENTRY_LIST = new EntryList();
     ENTRY_LIST.init();
+    ENTRY_LIST.fetchServerList();
 });
 
