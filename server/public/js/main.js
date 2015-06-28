@@ -5,8 +5,8 @@
  *
  */
 
-function Entry(id, brightness, parentDom) {
-    this.id = id || 0;
+function Entry(address, brightness, parentDom) {
+    this.address = address || 0;
     this.brightness = brightness || 0;
     this.MIN_BRIGHTNESS = 0;
     this.MAX_BRIGHTNESS = 100;
@@ -14,7 +14,7 @@ function Entry(id, brightness, parentDom) {
     this.rootDom = null;
     this.entryTopDom = null;
     this.entryBottomDom = null;
-    this.idDom = null;
+    this.addressDom = null;
     this.brightnessDom = null;
     this.valueDom = null;
     this.sendBtnDom = null;
@@ -27,7 +27,7 @@ Entry.prototype = {
         this.entryTopDom = $('<div class="entry-top container-fluid"></div>')
                             .appendTo(this.rootDom);
         this.entryBottomDom = $('<form class="entry-bottom navbar-form navbar-left"></div>') .appendTo(this.rootDom);
-        this.idDom = $('<div class="id navbar-text">ID: ' + this.id + '</div>').appendTo(this.entryTopDom);
+        this.addressDom = $('<div class="address navbar-text">ID: ' + this.address + '</div>').appendTo(this.entryTopDom);
         this.brightnessDom = $('<div class="brightness navbar-text">Brightness: ' + this.brightness + '</div>').appendTo(this.entryTopDom);
         this.valueDom = $('<div class="form-group"><input class="value" placeholder="Enter new value"></div></div>').appendTo(this.entryBottomDom);
         this.sendBtnDom = $('<button class="send-btn btn btn-default">Send</div>').appendTo(this.entryBottomDom);
@@ -59,9 +59,7 @@ Entry.prototype = {
         var that = this;
         jQuery.ajax({
             method: "POST",
-            url: HOSTNAME + "/devices/" + this.id + "/" + brightness,
-            dataType: "json",
-            crossDomain: true
+            url: HOSTNAME + "/devices/" + this.address + "/" + brightness
         })
         .done(function(data, textStatus, jqXHR) {
             that.brightness = brightness;
@@ -76,10 +74,7 @@ Entry.prototype = {
         var that = this;
         jQuery.ajax({
             method: "GET",
-            url: HOSTNAME + "/devices/" + that.id,
-            contentType: "application/json",
-            dataType: "json",
-            crossDomain: true
+            url: HOSTNAME + "/devices/" + that.address,
         })
         .done(function(data, textStatus, jqXHR) {
             that.brightness = brightness;
@@ -102,49 +97,53 @@ EntryList.prototype = {
     init: function() {
         this.rootDom = $('<div class="entry-list"></div>').appendTo(this.PARENT_DOM);
     },
-    addEntry: function(id) {
-        id = Math.round(id);
-        if (!id || id < 0 || id > this.MAX_ID) {
+    addEntry: function(address) {
+        id = Math.round(address);
+        if (!address || address < 0 || address > this.MAX_ID) {
             alert("Error: invalid id");
-        } else if (id in this.hash) {
+        } else if (address in this.hash) {
             alert("Error: an entry with this id already exists.");
         } else {
             var that = this;
             jQuery.ajax({
                 method: "POST",
-                url: HOSTNAME + "/devices/" + id, 
-                dataType: "json",
-                //crossDomain: true
+                url: HOSTNAME + "/devices/" + address, 
             })
             .done(function(data, textStatus, jqXHR) {
-                that.hash[id] = new Entry(id, 0, that.rootDom);
-                that.hash[id].init();
+                that.hash[address] = new Entry(id, 0, that.rootDom);
+                that.hash[address].init();
             })
             .fail(function(data, textStatus, jqXHR) {
                 alert(textStatus);
             });
         }
     },
-    deleteEntry: function(id) {
-        if (!(id in this.hash)) {
+    deleteEntry: function(address) {
+        if (!(address in this.hash)) {
             alert("Error: no entry with this id exists");
         } else {
             //TODO: put ajax request here
-            this.hash[id].destroy();
-            delete this.hash[id]
+            jQuery.ajax({
+                method: "DELETE",
+                url: HOSTNAME + "/devices/" + address,
+                dataType: "json"
+            });
+            this.hash[address].destroy();
+            delete this.hash[address]
         }
     },
     fetchServerList: function() {
         var that = this;
         jQuery.ajax({
             method: "GET",
-            url: HOSTNAME + "/devices/",
-            dataType: "json",
-            crossDomain: true
+            url: HOSTNAME + "/devices/"
         })
         .done(function(data, textStatus, jqXHR) {
             var deviceHash = jqXHR.responseJSON;
             var newEntry;
+            /* Make two passes, once over the JSON and once
+             * over the existing hash to add and delete objects
+             * respectively. */
             jQuery.each(deviceHash, function(index, object) {
                 if (!that.hash[object.address]) {
                     that.hash[object.address] = new Entry(object.address,
@@ -152,10 +151,24 @@ EntryList.prototype = {
                     that.hash[object.address].init();
                 }
             });
+            jQuery.each(that.hash, function(index, object) {
+                if (!deviceHash[object.address]) {
+                    that.hash[object.address].destroy();
+                    delete that.hash[object.address];
+                }
+            });
         })
         .fail(function(data, textStatus, jqXHR) {
             alert("Error: could not fetch devices from database");
         });
+    },
+    deleteList: function() {
+        jQuery.ajax({
+            method: "DELETE",
+            url: HOSTNAME + "/devices/",
+            dataType: "json"
+        });
+        this.fetchServerList();
     }
 }
 

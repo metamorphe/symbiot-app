@@ -1,6 +1,7 @@
 var Device = require('./models/device.js');
 var path = require('path');
 var db = require(__dirname + '/../config/db');
+var mongoose = require('mongoose');
 
 module.exports = function(app) {
     // Server Routes ==================
@@ -50,7 +51,7 @@ module.exports = function(app) {
     });
 
     app.delete('/devices/', function(req, res) {
-        mongoose.connection.db.dropCollection('device', function(err) {
+        mongoose.connection.db.dropCollection('devices', function(err) {
             if (err) res.send(err);
             res.status(200).end();
         });
