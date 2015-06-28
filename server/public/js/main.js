@@ -54,6 +54,7 @@ Entry.prototype = {
             || brightness > this.MAX_BRIGHTNESS) {
             alert("Error: brightness must be an integer between "
                     + this.MIN_BRIGHTNESS + " and " + this.MAX_BRIGHTNESS);
+            return;
         }
         var that = this;
         jQuery.ajax({
@@ -113,7 +114,7 @@ EntryList.prototype = {
                 method: "POST",
                 url: HOSTNAME + "/devices/" + id, 
                 dataType: "json",
-                crossDomain: true
+                //crossDomain: true
             })
             .done(function(data, textStatus, jqXHR) {
                 that.hash[id] = new Entry(id, 0, that.rootDom);
@@ -137,22 +138,23 @@ EntryList.prototype = {
         var that = this;
         jQuery.ajax({
             method: "GET",
-            url: "http://localhost:8000/devices/",
+            url: HOSTNAME + "/devices/",
             dataType: "json",
             crossDomain: true
         })
         .done(function(data, textStatus, jqXHR) {
             var deviceHash = jqXHR.responseJSON;
             var newEntry;
-            jQuery.each(deviceHash, function(id, brightness) {
-                if (!that.hash[id]) {
-                    that.hash[id] = new Entry(id, brightness, that.rootDom);
-                    that.hash[id].init();
+            jQuery.each(deviceHash, function(index, object) {
+                if (!that.hash[object.address]) {
+                    that.hash[object.address] = new Entry(object.address,
+                                object.brightness, that.rootDom);
+                    that.hash[object.address].init();
                 }
             });
         })
         .fail(function(data, textStatus, jqXHR) {
-            alert("Error: could not refresh");
+            alert("Error: could not fetch devices from database");
         });
     }
 }
@@ -198,7 +200,7 @@ $(document).ready(function() {
      *
      * <hostname>:<port>
      */
-    HOSTNAME = "http://localhost:8000";
+    HOSTNAME = "http://localhost:3000";
 
     ENTRY_MANAGER = new EntryManager();
     ENTRY_MANAGER.init();
