@@ -13,6 +13,10 @@ RF24NetworkHeader *most_recent_header;
 uint8_t num_lines;
 static uint8_t current_line_num;
 uint16_t address_buffer;
+unsigned long time = 0;
+unsigned long total_time = 0;
+int acks_received = 0;
+int repetitions = 0;
 
 /* Functions for behavior transmission. */
 static void send_alloc_message (uint16_t, uint16_t, uint8_t);
@@ -24,11 +28,11 @@ static inline void handle_line_message (void);
 static inline void handle_end_message (void);
 
 /* Functions for service discovery. */
-static void send_discovery_message (uint16_t, uint16_t);
-static void send_acknowledge_message (uint16_t, uint16_t);
+void send_discovery_message (uint16_t, uint16_t);
+void send_acknowledge_message (uint16_t, uint16_t);
 
-static inline void handle_discovery_message (void);
-static inline void handle_acknowledge_message (void);
+inline void handle_discovery_message (void);
+inline void handle_acknowledge_message (void);
 
 static inline void handle_unknown_message (void);
 
@@ -103,7 +107,7 @@ test_connection (uint16_t to_node, uint16_t from_node, unsigned long timeout)
     ok = receive();
     if (ok)
       return 1;
-    delay (100);
+      delay (100);
   }
   printf_P (PSTR ("%lu: APP Timeout while trying to connect to node 0%o\r\n"),
                   millis (), to_node);
@@ -151,12 +155,13 @@ send_end_message (uint16_t to_node, uint16_t from_node)
     printf_P(PSTR("%lu: APP Send end message failed\n\r"), millis ());
 }
 
-static void
+void
 send_discovery_message (uint16_t to_node, uint16_t from_node)
 {
   RF24NetworkHeader header(to_node, 'D');
   header.from_node = from_node;
   char buf[4] = { 'D', 'I', 'S', '\0' };
+  time = millis ();
   bool ok = network.write (header, &buf, sizeof(buf));
   // if (ok)
   //   printf_P(PSTR("%lu: APP Send discovery to 0%o message ok\n\r"), millis (), to_node);
@@ -164,7 +169,7 @@ send_discovery_message (uint16_t to_node, uint16_t from_node)
   //   printf_P(PSTR("%lu: APP Send discovery to 0%o message failed\n\r"), millis (), to_node);
 }
 
-static void
+void
 send_acknowledge_message (uint16_t to_node, uint16_t from_node)
 {
   RF24NetworkHeader header(to_node, 'C');
@@ -196,7 +201,7 @@ handle_end_message (void)
   network.read (header, NULL, 0);
 }
 
-static inline void
+inline void
 handle_discovery_message (void)
 {
   char buf[4];
@@ -208,10 +213,12 @@ handle_discovery_message (void)
   command_self_flash_yellow ();
 }
 
-static inline void
+inline void
 handle_acknowledge_message (void)
 {
   network.read (header, NULL, 0);
+  Serial.print ("Round-trip delay: ");
+  Serial.println (millis () - time);
   // printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
   //                 millis (), header.from_node);
 }

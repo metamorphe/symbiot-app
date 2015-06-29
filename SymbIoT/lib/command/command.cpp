@@ -2,6 +2,11 @@
 
 static void command_self_flash_helper (uint8_t, uint8_t, uint8_t);
 
+void command_discover (uint16_t to_node, uint16_t from_node)
+{
+  send_discovery_message (to_node, from_node);
+}
+
 void
 command_set_color (uint16_t to_node, uint16_t from_node,
                    uint8_t red_val, uint8_t green_val,

@@ -8,7 +8,7 @@
  * actuators immediately to a certain state. This is useful for a
  * calling application, particularly the scheduler, to coordinate large
  * amounts of Beans simply.
- *
+
  * Dependencies: socket.h, BlinkM.h
  * Used by: the Expresso scheduler
  */
@@ -31,6 +31,9 @@
      commanded light will output. E.g., for 50% brightness:
      command_set_intensity (00, 01, 50);
  */
+
+void command_discover (uint16_t, uint16_t);
+
 void command_turn_on (uint16_t, uint16_t);
 void command_turn_off (uint16_t, uint16_t);
 void command_set_intensity (uint16_t, uint16_t, int);

@@ -24,10 +24,15 @@
 #include "buffer.h"
 
 #include "command.h"
+#include "scheduler.h"
 
 extern blinkm_script_line buffer[16];
 extern RF24NetworkHeader *most_recent_header;
 extern uint8_t num_lines;
+
+extern unsigned long total_time;
+extern int acks_received;
+extern int repetitions;
 
 /* Setup functions */
 int setup_blinkM ();
@@ -37,6 +42,11 @@ int setup_buffer (size_t);
 /* Main functions */
 void send (uint16_t, uint16_t, blinkm_script_line *, uint8_t);
 int receive ();
+
+/* Auxiliary functions */
+
+void send_discovery_message (uint16_t, uint16_t);
+void send_acknowledge_message (uint16_t, uint16_t);
 
 /* Attempts to see if a specified to_node is on the network. Blocks
    until an acknowledge is received, or until a specified timeout is

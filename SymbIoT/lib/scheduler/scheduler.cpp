@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "socket.h"
 //Scheduling variables 
 // 12 is the maximum length of a decimal representation of a 32-bit integer,
 // including space for a leading minus sign and terminating null byte
@@ -64,6 +65,7 @@ void scheduler_process(String keyData, String valueData, uint16_t this_node){
     Serial.println(value);
 
     /* Send to network */
-    command_set_intensity ((uint16_t) addr, this_node, value);
+    // command_set_intensity ((uint16_t) addr, this_node, value);
+    command_discover ((uint16_t) addr, this_node);
 }
 
