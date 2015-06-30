@@ -32,7 +32,6 @@ extern uint8_t num_lines;
 
 extern unsigned long total_time;
 extern int acks_received;
-extern int repetitions;
 
 /* Setup functions */
 int setup_blinkM ();
@@ -52,5 +51,9 @@ void send_acknowledge_message (uint16_t, uint16_t);
    until an acknowledge is received, or until a specified timeout is
    up. */
 int test_connection (uint16_t, uint16_t, unsigned long);
+
+/* Functions for handling metadata from speed tests. */
+void socket_query_metadata (void);
+void socket_clear_metadata (void);
 
 #endif

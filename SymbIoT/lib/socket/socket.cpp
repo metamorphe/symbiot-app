@@ -15,8 +15,9 @@ static uint8_t current_line_num;
 uint16_t address_buffer;
 unsigned long time = 0;
 unsigned long total_time = 0;
+unsigned long total_squared_time = 0;
+int attempts = 0;
 int acks_received = 0;
-int repetitions = 0;
 
 /* Functions for behavior transmission. */
 static void send_alloc_message (uint16_t, uint16_t, uint8_t);
@@ -40,8 +41,12 @@ int
 setup_radio (uint16_t node_addr)
 {
   radio.begin ();
+  bool changed = radio.setDataRate (RF24_2MBPS);
+  Serial.println (changed);
   radio.setRetries (15,15);
   network.begin (90, node_addr);
+  Serial.print ("data rate enum is: ");
+  Serial.print (radio.getDataRate ());
   return 1;
 }
 
@@ -161,6 +166,7 @@ send_discovery_message (uint16_t to_node, uint16_t from_node)
   RF24NetworkHeader header(to_node, 'D');
   header.from_node = from_node;
   char buf[4] = { 'D', 'I', 'S', '\0' };
+  attempts++;
   time = millis ();
   bool ok = network.write (header, &buf, sizeof(buf));
   // if (ok)
@@ -217,8 +223,13 @@ inline void
 handle_acknowledge_message (void)
 {
   network.read (header, NULL, 0);
+  unsigned long rtt = millis () - time;
   Serial.print ("Round-trip delay: ");
-  Serial.println (millis () - time);
+  Serial.println (rtt);
+  total_time += rtt;
+  total_squared_time += rtt * rtt;
+  ++acks_received;
+  Serial.print ("\r\ncmd>");
   // printf_P (PSTR ("%lu: APP Received successful acknowledge from 0%o\r\n"),
   //                 millis (), header.from_node);
 }
@@ -229,3 +240,33 @@ handle_unknown_message (void)
   printf_P (PSTR ("*** WARNING *** Unknown message type %c\n\r"), header.type);
   network.read (header, 0, 0);
 }
+
+void
+socket_query_metadata (void)
+{
+  Serial.print ("Number of requests sent: ");
+  Serial.println (attempts);
+  Serial.print ("Number of ACKs received: ");
+  Serial.println (acks_received);
+  Serial.print ("Packet loss: ");
+  Serial.println (1 - acks_received / attempts);
+  Serial.print ("Total RTT time from ACKed trips: ");
+  Serial.println (total_time);
+  Serial.print ("Average RTT: ");
+  Serial.println (total_time / acks_received);
+  Serial.print ("Standard deviation: ");
+  Serial.println (sqrt(
+                 (total_squared_time - (total_time * total_time) / acks_received)
+                 / (acks_received - 1)
+                 ));
+}
+
+void
+socket_clear_metadata (void)
+{
+  attempts = 0;
+  acks_received = 0;
+  total_time = 0;
+  total_squared_time = 0;
+}
+
