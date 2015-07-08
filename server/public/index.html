@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="symbiotApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,10 +12,16 @@
 
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
-    <script src="./js/main.js"></script>
+    <script src="./assets/bower_components/angular/angular.js"></script>
+    <script src="./app/app.js"></script>
   </head>
   <body>
-    <div class="container"></div>
+    <div ng-controller="mapController" class="map-container">
+        <img ng-src="{{imgUrl}}" class="img-responsive">
+    </div>
+    
+    <div ng-controller="mapController" class="map-container">
+        <img ng-src="{{imgUrl}}" class="img-responsive">
+    </div>
   </body>
 </html>
