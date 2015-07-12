@@ -6,22 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Node Control</title>
-    <link href="css/style.css" rel="stylesheet"/>
+    <link href="./css/style.css" rel="stylesheet"/>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script src="./assets/bower_components/angular/angular.js"></script>
+    <script src="./assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="./app/app.js"></script>
   </head>
   <body>
     <div ng-controller="mapController" class="map-container">
-        <img ng-src="{{imgUrl}}" class="img-responsive">
+        <img ng-src="{{imgUrl}}"
+             class="img-responsive"
+             ng-right-click="addPoint()">
+        <div ng-repeat="point in points track by $index">
+            <point x="{{point.x}}" y="{{point.y}}"></point> 
+        </div>
+        <div class="btn-group">
+            <label class="btn btn-default"
+                   ng-model="progMode"
+                   btn-radio="'Playground'">Playground</label>
+            <label class="btn btn-default"
+                   ng-model="progMode"
+                   btn-radio="'Programming'">Programming</label>
+        </div>
+        <div>There are {{points.length}} nodes. Soon there will be panels here.</div>
+        <div ng-repeat="point in points track by $index" class="node-container">
+            <div class="node navbar navbar-default">
+                ({{point.x}}, {{point.y}}, {{point.address}}, [behavior])
+                <div class="dropdown" dropdown on-toggle="">
+                    <a href class="dropdown-toggle" dropdown-toggle>
+                        My point behavior
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div ng-controller="mapController" class="map-container">
-        <img ng-src="{{imgUrl}}" class="img-responsive">
-    </div>
   </body>
 </html>

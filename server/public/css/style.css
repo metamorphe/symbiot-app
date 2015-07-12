@@ -1,11 +1,35 @@
-.entry {
+/* Angular.UI routing fix */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.point {
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    font-size: 16pt;
+    line-height: 40pt;
+    color: white;
+    height: 50px;
+    width: 50px;
+    background-color: #F1C40F;
+    border-radius: 50%;
+}
+
+.point-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    background-color: white;
+}
+
+.node-container {
     display: inline-block;
 }
 
-.id {
+.node {
     display: inline-block;
-}
-
-.brightness {
-    display: inline-block;
+    padding: 15px;
+    margin-right: 10px;
 }

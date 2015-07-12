@@ -1,0 +1,16 @@
+<div type="text/ng-template">
+    <div>{{pointMenu.content}}</div>
+    <div class="form-group">
+        <label>Address</label>
+        <input type="number"
+               ng-model="point.address"
+               min="0"
+               max="15"
+               class="form-control">
+        <br>
+        <button ng-click="deletePoint(point)"
+                class="btn btn-danger">
+            Delete
+        </button>
+    </div>
+</div>
