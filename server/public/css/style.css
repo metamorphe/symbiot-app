@@ -7,11 +7,12 @@
     left: 0;
     text-align: center;
     font-size: 16pt;
-    line-height: 40pt;
+    line-height: 32pt;
     color: white;
     height: 50px;
     width: 50px;
-    background-color: #F1C40F;
+    background-color: transparent;
+    border: 5px solid #F1C40F;
     border-radius: 50%;
 }
 
