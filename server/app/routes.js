@@ -22,26 +22,42 @@ module.exports = function(app) {
     });
 
     app.post('/devices/:address', function(req, res) {
-        Device({ address: req.params.address, brightness: 0 })
-                .save(function(err) {
-                    if (err) res.send(err);
-                    console.log("Skabede DEVICE med adresse: "
-                                    + req.params.address);
-                    res.status(200).end();
-                });
+        /* Did we receive content? If not, fill in an object with address */
+        var json = (Object.keys(req.body).length)
+                    ? req.body
+                    : { address: req.params.address };
+        if (!Device.addressMatchesObj(req.params.address, json)) {
+            res.send('URL address and JSON do not match')
+                     .status(400).end();
+        }
+        if (Device.addressAlreadyInUse(req.params.address)) {
+            res.send('Address already in use')
+                     .status(400).end();
+        }
+        Device(json)
+            .save(function(err) {
+                if (err) res.send(err);
+                console.log('Skabede DEVICE med adresse: '                                                         + req.params.address);
+                res.status(200).end();
+        });
     });
 
-    app.post('/devices/:address/:brightness', function(req, res) {
+    app.put('/devices/:address', function(req, res) {
         Device.findOne({address: req.params.address}, function(err, device) {
-            device.updateBrightness(req.params.brightness);
+            if (err) res.send(err);
+            if (!device) res.send('No device with address: '
+                            + req.params.address).status(400).end()
+            device.update(req.body);
             device.save();
-            console.log("Lysstyrke ændret til: " + req.params.brightness);
+            console.log('Instillinger ændret til: ' + req.body.brightness);
             res.status(200).end();
         })
     });
 
     app.delete('/devices/:address', function(req, res) {
         Device.findOne({address: req.params.address}, function(err, device) {
+            if (!device) res.send('No device with address: '
+                            + req.params.address).status(400).end()
             device.remove(function(err) {
                 if (err) res.send(err);
                 console.log('Slettede DEVICE med adresse: ' + req.params.address);
