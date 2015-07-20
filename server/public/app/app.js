@@ -10,7 +10,8 @@ mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMed
         templateUrl: '../views/_pointMenu.html',
         title: 'Actuator Options'
     };
-
+    
+    $scope.pointQueue = [];
     $scope.points = {};
     nodeService.getNodes(function(data) {
         angular.forEach(data, function (value, key, object) {
@@ -56,15 +57,23 @@ mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMed
     $scope.addPoint = function() {
         var x = event.offsetX;
         var y = event.offsetY;
-        nodeService.createNode($scope.currId,
-            { address: $scope.currId, x: x, y: y})
-            .success(function(data, status) {
-                $scope.points[data._id] = data;
-            })
-            .error(function(data, status) {
-                alert(data);
-            });
+        $scope.points[$scope.currId] =
+            { _id : $scope.currId, address: $scope.currId, x: x, y: y};
         $scope.currId++;
+    };
+
+    $scope.sendPoints = function() {
+        nodeService.deleteNodes()
+            .success(function() {
+                console.log($scope.points);
+                nodeService.createNodes($scope.points)
+                    .success(function(data, status) {
+                        alert('Success!');
+                    })
+                    .error(function(data, status) {
+                        alert('Error.');
+                    });
+            });
     };
 
     $scope.changePointAddress = function(point, oldAddress) {
@@ -72,6 +81,9 @@ mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMed
                     { address : point.address })
                 .success(function(data, status) {
                     $scope.points[point._id].address = point.address;
+                })
+                .error(function(data, status) {
+                    alert(data);
                 });
     }
 
@@ -106,7 +118,8 @@ mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMed
 mapModule.service('nodeService', ['$http', function($http) {
     this.getNodes = function(callback) {
         return $http.get('/devices').success(function(data) {
-            callback(data);
+            if (callback !== null && callback !== undefined)
+                callback(data);
         });
     };
 
@@ -114,9 +127,13 @@ mapModule.service('nodeService', ['$http', function($http) {
          return $http.post('/devices/' + address, json);
     };
 
+    this.createNodes = function(json) {
+        return $http.post('/devices', json);
+    };
+
     this.updateNode = function(address, json) {
-        return $http.put('devices/' + address, json);
-    }
+        return $http.put('/devices/' + address, json);
+    };
 
     this.deleteNode = function(address) {
         return $http.delete('/devices/' + address);
@@ -124,7 +141,8 @@ mapModule.service('nodeService', ['$http', function($http) {
 
     this.deleteNodes = function(callback) {
         return $http.delete('/devices/').success(function(data) {
-            callback(data);
+            if (callback !== null && callback !== undefined)
+                callback(data);
         });
     };
 
