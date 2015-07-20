@@ -35,9 +35,10 @@ module.exports = function(app) {
                      .status(400).end();
         }
         Device(json)
-            .save(function(err) {
+            .save(function(err, device) {
                 if (err) res.send(err);
                 console.log('Skabede DEVICE med adresse: '                                                         + req.params.address);
+                res.json(device);
                 res.status(200).end();
         });
     });
@@ -45,12 +46,15 @@ module.exports = function(app) {
     app.put('/devices/:address', function(req, res) {
         Device.findOne({address: req.params.address}, function(err, device) {
             if (err) res.send(err);
-            if (!device) res.send('No device with address: '
-                            + req.params.address).status(400).end()
-            device.update(req.body);
-            device.save();
-            console.log('Instillinger ændret til: ' + req.body.brightness);
-            res.status(200).end();
+            if (!device) {
+                res.send('No device with address: '
+                            + req.params.address).status(400).end();
+            } else {
+                device.update(req.body);
+                device.save();
+                res.json(device);
+                res.status(200).end();
+            }
         })
     });
 

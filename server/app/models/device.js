@@ -12,21 +12,23 @@ var deviceSchema = new mongoose.Schema({
 
 deviceSchema.methods.update = function(newJson) {
     var oldBrightness = this.brightness;
-    if (typeof newJson.brightness != "undefined")
+    if (typeof newJson.address != 'undefined')
+        this.address = newJson.address;
+    if (typeof newJson.brightness != 'undefined')
         this.brightness = newJson.brightness;
-    if (typeof newJson.x != "undefined")
+    if (typeof newJson.x != 'undefined')
         this.x = newJson.x || this.x;
-    if (typeof newJson.y != "undefined")
+    if (typeof newJson.y != 'undefined')
         this.y = newJson.y || this.y;
     /* Finally, send new brightness to physical device */
     if (oldBrightness != this.brightness) {
-        this.serialSetBrightness(brightness);
+        this.serialSetBrightness(this.brightness);
     }
-    console.log("Changed to: " + this.brightness);
+    console.log('Changed to: ' + this.brightness);
 };
 
 deviceSchema.methods.serialSetBrightness = function(brightness) {
-    if (typeof serialPort != "undefined") {
+    if (typeof serialPort != 'undefined') {
         serialPort.write('s' + this.address + ',' + this.brightness
                             + '\n');
     }
