@@ -50,8 +50,12 @@
                 Behavior: {{point.behavior.name}}
             </div>
         </div>
-        <button class="btn btn-danger"
-                ng-click="deletePoints()">Clear All</button>
+        <div class="btn-group">
+            <label class="btn btn-default"
+                   ng-click="sendPoints()">Create Nodes</label>
+            <label class="btn btn-danger"
+                   ng-click="deletePoints()">Clear All</label>
+        </div>
     </div>
     
   </body>

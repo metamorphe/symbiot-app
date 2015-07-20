@@ -3,6 +3,7 @@ var path = require('path');
 var serialPort = require(__dirname + '/../../config/serial.js');
 
 var deviceSchema = new mongoose.Schema({
+    _id : {type: Number },
     address : { type: Number, default : 0 },
     brightness : { type : Number, default : 0 },
     x : { type: Number, default : 0 },
@@ -43,11 +44,9 @@ deviceSchema.statics.addressMatchesObj = function (address, json) {
 };
 
 deviceSchema.statics.addressAlreadyInUse = function(address) {
-    var result;
     this.findOne({address: address}, function(err, device) {
-        result = typeof device != 'null' && typeof device != 'undefined';
+        return device !== null;
     });
-    return result;
 };
 
 module.exports = mongoose.model('Device', deviceSchema);
