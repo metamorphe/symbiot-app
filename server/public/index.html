@@ -18,9 +18,16 @@
   </head>
   <body>
     <div ng-controller="mapController" class="map-container">
-        <img ng-src="{{imgUrl}}"
-             class="img-responsive"
-             ng-right-click="addPoint()">
+        <div class="row">
+            <!-- <img ng-src="{{imgUrl}}"
+                 class="img-responsive"
+                 ng-right-click="addPoint()"> -->
+            <video id="gum-local"
+                   ng-src="{{videostream}}"
+                   ng-init="captureVideo()"
+                   ng-right-click="addPoint()"
+                   autoplay></video>
+        </div>
         <div ng-repeat="point in points track by $index">
             <point x="{{point.x}}" y="{{point.y}}"></point> 
         </div>
@@ -32,19 +39,19 @@
                    ng-model="progMode"
                    btn-radio="'Programming'">Programming</label>
         </div>
-        <div>There are {{points.length}} nodes. Soon there will be panels here.</div>
+        <div>
+            Nodes
+        </div>
         <div ng-repeat="point in points track by $index" class="node-container">
             <div class="node navbar navbar-default">
-                ({{point.x}}, {{point.y}}, {{point.address}}, [behavior])
-                <div class="dropdown" dropdown on-toggle="">
-                    <a href class="dropdown-toggle" dropdown-toggle>
-                        My point behavior
-                    </a>
-                </div>
+                Address : {{point.address}}<br/>
+                x : {{point.x}}<br/>
+                y : {{point.y}}<br/>
+                Behavior: {{point.behavior.name}}
             </div>
         </div>
         <button class="btn btn-danger"
-                ng-click="deleteNodes()">Clear All</button>
+                ng-click="deletePoints()">Clear All</button>
     </div>
     
   </body>

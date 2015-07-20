@@ -1,8 +1,8 @@
 /* Map */
 var mapModule = angular.module('mapModule', []);
 
-mapModule.controller('mapController', ['$scope', 'nodeService',
-                        function($scope, nodeService) {
+mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMedia',
+                        function($scope, $sce, nodeService, UserMedia) {
     $scope.imgUrl = '../img/wall_formation.JPG';
 
     $scope.pointMenu= {
@@ -11,53 +11,93 @@ mapModule.controller('mapController', ['$scope', 'nodeService',
         title: 'Actuator Options'
     };
 
-    // $scope.points = nodeService.getNodes();
     $scope.points = {};
     nodeService.getNodes(function(data) {
         angular.forEach(data, function (value, key, object) {
-            $scope.points[$scope.currI] = object;
+            $scope.points[value._id] = value;
         });
-        // $scope.points = data;
     });
+
+    $scope.behaviors = {
+        toggle: {
+            name: 'toggle',
+            lambda: function(point) {
+                if (point.brightness) {
+                    nodeService.updateNode(point.address,
+                        { brightness : 0})
+                        .success(function(data) {
+                            $scope.points[data._id] = data;
+                        });
+                } else {
+                    nodeService.updateNode(point.address,
+                        { brightness : 100})
+                        .success(function(data) {
+                            $scope.points[data._id] = data;
+                        });
+                }
+            }
+        },
+        fade : {
+            name: 'fade',
+            lambda: function(point) {
+                alert('Not yet implemented :(');
+            }
+        }
+    };
 
     $scope.currId = 0;
 
     $scope.progMode = 'Playground';
 
     $scope.actuate = function(point) {
-        console.log(point);
-        nodeService.setBrightness(point.address, 100);
+        ($scope.behaviors['toggle'].lambda)(point);
     };
 
     $scope.addPoint = function() {
-        var _x = event.offsetX;
-        var _y = event.offsetY;
-        $scope.points[$scope.currId] = ({
-            id: $scope.currId,
-            x: _x,
-            y: _y,
-            address: null
-        });
+        var x = event.offsetX;
+        var y = event.offsetY;
+        nodeService.createNode($scope.currId,
+            { address: $scope.currId, x: x, y: y})
+            .success(function(data, status) {
+                $scope.points[data._id] = data;
+            })
+            .error(function(data, status) {
+                alert(data);
+            });
         $scope.currId++;
     };
 
-    $scope.changePointAddress = function(id, address) {
-        var point = $scope.points[id];
-        if (point.address in $scope.points) {
-            nodeService.deleteNode(point.address);
-        }
-        nodeService.createNode(address);
-        point.address = address;
+    $scope.changePointAddress = function(point, oldAddress) {
+        return nodeService.updateNode(oldAddress,
+                    { address : point.address })
+                .success(function(data, status) {
+                    $scope.points[point._id].address = point.address;
+                });
     }
 
     $scope.deletePoint = function(point) {
-        nodeService.deleteNode(point.address);
-        delete $scope.points[point.id]
+        nodeService.deleteNode(point.address)
+            .success(function(data, status) {
+                delete $scope.points[point._id]
+            });
     };
 
     $scope.deletePoints = function() {
-        nodeService.deletePoints(function(data) {
+        nodeService.deleteNodes(function(data) {
             $scope.points = {};
+        });
+    };
+
+    $scope.captureVideo = function() {
+        UserMedia.get().then(function(stream) {
+            console.log('starting video', stream);
+            window.stream = stream; // stream available to console for dev
+            if (window.URL) {
+                console.log('using window.URL');
+                $scope.videostream = $sce.trustAsResourceUrl(window.URL.createObjectURL(stream));
+            } else {
+                $scope.videostream = $sce.trustAsResourceUrl(stream);
+            }
         });
     };
 
@@ -65,30 +105,70 @@ mapModule.controller('mapController', ['$scope', 'nodeService',
 
 mapModule.service('nodeService', ['$http', function($http) {
     this.getNodes = function(callback) {
-        $http.get('/devices').success(function(data) {
-            console.log(data);
+        return $http.get('/devices').success(function(data) {
             callback(data);
         });
     };
-            
-    this.createNode = function(address) {
-        $http.post('/devices/' + address);
+
+    this.createNode = function(address, json) {
+         return $http.post('/devices/' + address, json);
     };
+
+    this.updateNode = function(address, json) {
+        return $http.put('devices/' + address, json);
+    }
 
     this.deleteNode = function(address) {
-        $http.delete('/devices/' + address);
+        return $http.delete('/devices/' + address);
     };
 
-    this.deleteNodes = function() {
-        $http.get('/devices').success(function(data) {
+    this.deleteNodes = function(callback) {
+        return $http.delete('/devices/').success(function(data) {
             callback(data);
         });
     };
 
     this.setBrightness = function(address, brightness) {
-        $http.post('/devices/' + address + '/' + brightness);
+        return $http.post('/devices/' + address + '/' + brightness);
     };
 
+}]);
+
+mapModule.service('UserMedia', ['$q', function($q) {
+  
+  navigator.getUserMedia = navigator.getUserMedia ||
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  
+  var constraints = {
+    audio: false,
+    video: {
+        optional: [{
+        /* The sourceId is hard-coded. */
+        sourceId: '3c3b7e5360ff86ce236295de49b72e6'
+                    + '3edc871b2e7fce015213417905fb1fba1'
+      }]
+    }
+  };
+  
+  var deferred = $q.defer();
+  
+  var get = function() {
+    navigator.getUserMedia(
+      constraints,
+      function(stream) { deferred.resolve(stream); },
+      function errorCallback(error) {
+        console.log('navigator.getUserMedia error: ', error);
+        deferred.reject(error);
+      }
+    );
+    
+    return deferred.promise;
+  }
+  
+  return {
+    get: get
+  }
+  
 }]);
 
 mapModule.directive('ngRightClick', function ($parse) {

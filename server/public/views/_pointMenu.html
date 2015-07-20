@@ -2,19 +2,20 @@
     <div>{{pointMenu.content}}</div>
     <div class="form-group">
         <label>Address</label>
+        <!-- Note: we use {{point.address}} to get the old address -->
         <input type="number"
                ng-model="point.address"
-               ng-change="changePointAddress(point.id, point.address)"
+               ng-change="changePointAddress(point, '{{point.address}}')"
                min="0"
                max="15"
                class="form-control">
         <br>
-        <label>Point Behavior</label>
-        <select
-               ng-model="point.address"
-               ng-change=""
-               class="form-control"></select>
-        <br>
+        <!-- <label>Point Behavior</label> -->
+        <!-- <select ng-model="point.behavior"
+                ng-options="behavior.name for behavior in behaviors"
+                ng-change=""
+                class="form-control"></select> -->
+        <!-- <br> -->
         <button ng-click="deletePoint(point)"
                 class="btn btn-danger">
             Delete
