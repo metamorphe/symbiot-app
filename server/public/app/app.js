@@ -1,8 +1,11 @@
 /* Map */
 var mapModule = angular.module('mapModule', []);
 
-mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMedia',
-                        function($scope, $sce, nodeService, UserMedia) {
+mapModule.controller('mapController',
+                    ['$scope', '$sce', 'nodeService', 'behaviorService',
+                     'UserMedia',
+                     function($scope, $sce, nodeService, behaviorService,
+                              UserMedia) {
     $scope.imgUrl = '../img/wall_formation.JPG';
 
     $scope.pointMenu= {
@@ -45,6 +48,8 @@ mapModule.controller('mapController', ['$scope', '$sce', 'nodeService', 'UserMed
             }
         }
     };
+
+    $scope.ftl = behaviorService.followTheLeader;
 
     $scope.currId = 0;
 
@@ -152,6 +157,25 @@ mapModule.service('nodeService', ['$http', function($http) {
 
 }]);
 
+mapModule.service('behaviorService', [function() {
+    this.nodeQueue = [];
+
+    this.followTheLeader = function(nodeArr, actuateFn) {
+        /* Assumes 'toggle' point behavior */
+        (function lambda(idx) {
+            setTimeout(function() {
+                actuateFn(nodeArr[idx]);
+                if (idx + 1 < nodeArr.length)
+                    actuateFn(nodeArr[idx + 1]);
+                if (idx - 2 >= 0)
+                    actuateFn(nodeArr[idx - 2]);
+                if (++idx < nodeArr.length)
+                    lambda(idx);
+            }, 1000);
+        })(0);
+    };
+}]);
+
 mapModule.service('UserMedia', ['$q', function($q) {
   
   navigator.getUserMedia = navigator.getUserMedia ||
@@ -162,8 +186,10 @@ mapModule.service('UserMedia', ['$q', function($q) {
     video: {
         optional: [{
         /* The sourceId is hard-coded. */
-        sourceId: '3c3b7e5360ff86ce236295de49b72e6'
-                    + '3edc871b2e7fce015213417905fb1fba1'
+        //sourceId: '3c3b7e5360ff86ce236295de49b72e6'
+        //            + '3edc871b2e7fce015213417905fb1fba1'
+          sourceId: 'ac7b75ac861d20063baf9bbb152a7a9'
+                      + 'bd402b8b9bfdafc8a17d53bf74a6f61d9'
       }]
     }
   };
