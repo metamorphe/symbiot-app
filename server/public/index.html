@@ -31,7 +31,7 @@
         <div ng-repeat="point in points track by $index">
             <point x="{{point.x}}" y="{{point.y}}"></point> 
         </div>
-        <div class="btn-group">
+        <div class="btn-group mode-select">
             <label class="btn btn-default"
                    ng-model="progMode"
                    btn-radio="'Playground'">Playground</label>
@@ -39,22 +39,28 @@
                    ng-model="progMode"
                    btn-radio="'Programming'">Programming</label>
         </div>
-        <div>
-            Nodes
-        </div>
-        <div ng-repeat="point in points track by $index" class="node-container">
-            <div class="node navbar navbar-default">
-                Address : {{point.address}}<br/>
-                x : {{point.x}}<br/>
-                y : {{point.y}}<br/>
-                Behavior: {{point.behavior.name}}
+
+        <!--Playground Mode-->
+        <div ng-show="progMode === 'Playground'" class="ng-hide">
+            <div ng-repeat="point in points track by $index" class="node-container">
+                <div class="node navbar navbar-default">
+                    Address : {{point.address}}<br/>
+                    x : {{point.x}}<br/>
+                    y : {{point.y}}<br/>
+                    Behavior: {{point.behavior.name}}
+                </div>
+            </div>
+            <div class="btn-group">
+                <label class="btn btn-default"
+                       ng-click="sendPoints()">Create Nodes</label>
+                <label class="btn btn-danger"
+                       ng-click="deletePoints()">Clear All</label>
             </div>
         </div>
-        <div class="btn-group">
-            <label class="btn btn-default"
-                   ng-click="sendPoints()">Create Nodes</label>
-            <label class="btn btn-danger"
-                   ng-click="deletePoints()">Clear All</label>
+
+        <!--Programming Mode-->
+        <div ng-show="progMode === 'Programming'" class='ng-hide'>
+            Hi
         </div>
     </div>
     
