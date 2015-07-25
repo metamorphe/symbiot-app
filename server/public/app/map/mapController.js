@@ -1,11 +1,9 @@
-angular.module('mapModule', [])
+angular.module('mapModule')
     .controller('mapController',
-                    ['$scope', '$sce', 'nodeService', 'pointBehaviorService',
+                    ['$scope', '$sce', 'nodeService', 'behaviorService',
                      'UserMedia',
-                     function($scope, $sce, nodeService, pointBehaviorService,
+                     function($scope, $sce, nodeService, behaviorService,
                               UserMedia) {
-    $scope.imgUrl = '../img/wall_formation.JPG';
-
     $scope.pointMenu= {
         content: 'Lorem Ipsum',
         templateUrl: '../views/_pointMenu.html',
@@ -13,7 +11,7 @@ angular.module('mapModule', [])
     };
 
     $scope.pointQueue = [];
-    $scope.points = {};
+    $scope.points = $scope.points || {};
     nodeService.getNodes(function(data) {
         angular.forEach(data, function (value, key, object) {
             $scope.points[value._id] = value;
@@ -47,12 +45,10 @@ angular.module('mapModule', [])
         }
     };
 
-    $scope.followTheLeader = pointBehaviorService.followTheLeader;
-    $scope.lineFill = pointBehaviorService.lineFill;
+    $scope.followTheLeader = behaviorService.followTheLeader;
+    $scope.lineFill = behaviorService.lineFill;
 
     $scope.currId = 0;
-
-    $scope.progMode = 'Playground';
 
     $scope.actuate = function(point) {
         ($scope.behaviors['toggle'].lambda)(point);
@@ -89,7 +85,7 @@ angular.module('mapModule', [])
                 .error(function(data, status) {
                     alert(data);
                 });
-    }
+    };
 
     $scope.deletePoint = function(point) {
         nodeService.deleteNode(point.address)
@@ -105,7 +101,7 @@ angular.module('mapModule', [])
     };
 
     $scope.captureVideo = function() {
-        pointBehaviorService.get().then(function(stream) {
+        UserMedia.get().then(function(stream) {
             console.log('starting video', stream);
             window.stream = stream; // stream available to console for dev
             if (window.URL) {

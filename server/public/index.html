@@ -14,73 +14,39 @@
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script src="./assets/bower_components/angular/angular.js"></script>
     <script src="./assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="./assets/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="./app/app.js"></script>
     <script src="./app/map/mapController.js"></script>
     <script src="./app/map/nodeService.js"></script>
-    <script src="./app/map/pointBehaviorService.js"></script>
     <script src="./app/map/userMediaService.js"></script>
     <script src="./app/map/pointDirective.js"></script>
     <script src="./app/map/pointMenuDirective.js"></script>
     <script src="./app/map/ngRightClickDirective.js"></script>
+    <script src="./app/behavior/behaviorService.js"></script>
   </head>
   <body ng-app="symbiotApp">
-    <div ng-controller="mapController" class="map-container">
-        <div class="row">
-            <img ng-src="{{imgUrl}}"
-                 class="img-responsive"
-                 ng-right-click="addPoint()">
-            <!-- <video id="gum-local"
-                   ng-src="{{videostream}}"
-                   ng-init="captureVideo()"
-                   ng-right-click="addPoint()"
-                   autoplay></video> -->
-        </div>
-        <div ng-repeat="point in points track by $index">
-            <point x="{{point.x}}" y="{{point.y}}"></point>
-        </div>
-        <div class="btn-group mode-select">
-            <label class="btn btn-default"
-                   ng-model="progMode"
-                   btn-radio="'Playground'">Playground</label>
-            <label class="btn btn-default"
-                   ng-model="progMode"
-                   btn-radio="'Programming'">Programming</label>
+    <div ng-controller="mapController" class="map-container container">
+        <!-- <a ui-sref="click">Click</a>
+        <a ui-sref="lineFill">lineFill</a> -->
+        <div class="row no-gutter">
+            <div class="toolbar col-md-2">
+                <img src="./img/toolbar_mock.png"
+                     usemap="#toolbar-map"
+                     class="img-responsive">
+            </div>
+            <map name="toolbar-map">
+                <area shape="square" coords="10,35,45,65" ui-sref="click" />
+                <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
+                <area shape="square" coords="50,130,85,160" />
+            </map>
+            <div ui-view class="map col-md-10"></div>
         </div>
 
-        <!--Playground Mode-->
-        <div ng-show="progMode === 'Playground'" class="ng-hide">
-            <div ng-repeat="point in points track by $index" class="node-container">
-                <div class="node navbar navbar-default">
-                    Address : {{point.address}}<br/>
-                    x : {{point.x}}<br/>
-                    y : {{point.y}}<br/>
-                    Behavior: {{point.behavior.name}}
-                </div>
-            </div>
-            <div class="btn-group">
-                <label class="btn btn-default"
-                       ng-click="sendPoints()">Create Nodes</label>
-                <label class="btn btn-danger"
-                       ng-click="deletePoints()">Clear All</label>
-            </div>
-        </div>
-
-        <!--Programming Mode-->
-        <div ng-show="progMode === 'Programming'" class='ng-hide'>
-            <nav class="tool navbar navbar-default">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <div class="navbar-brand">Path</div>
-                    </div>
-                    <ul class="nav navbar-nav">
-                        <li><a href="">Select</a></li>
-                        <li><a href="">Behavior</a></li>
-                    </ul>
-                    <form class="navbar-form navbar-left">
-                        <button class="btn btn-default">Actuate</button>
-                    </form>
-                </div>
-            </nav>
+        <div class="btn-group row">
+            <label class="btn btn-default"
+                   ng-click="sendPoints()">Create Nodes</label>
+            <label class="btn btn-danger"
+                   ng-click="deletePoints()">Clear All</label>
         </div>
     </div>
 

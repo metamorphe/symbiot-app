@@ -1,5 +1,5 @@
-angular.module('mapModule')
-    .service('pointBehaviorService', [function() {
+angular.module('behaviorModule')
+    .service('behaviorService', [function() {
     this.nodeQueue = [];
 
     this.lineFill = function(nodeArr, actuateFn) {
