@@ -96,7 +96,8 @@ angular.module('mapModule')
 
     $scope.deletePoints = function() {
         nodeService.deleteNodes(function(data) {
-            $scope.points = {};
+            // $scope.points = {}; //FIXME: no way to empty parent scope object
+            window.location.reload(false);
         });
     };
 
