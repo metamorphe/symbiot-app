@@ -52,7 +52,8 @@ module.exports = function(app) {
             Device(json)
                 .save(function(err, device) {
                     if (err) res.send(err);
-                    console.log('Skabede DEVICE med adresse: '                                                         + req.params.address);
+                    console.log('Skabede DEVICE med adresse: '
+                                    + req.params.address);
                     res.json(device);
                     res.status(200).end();
             });
@@ -81,13 +82,16 @@ module.exports = function(app) {
 
     app.delete('/devices/:address', function(req, res) {
         Device.findOne({address: req.params.address}, function(err, device) {
-            if (!device) res.send('No device with address: '
+            if (!device) {
+                res.send('No device with address: '
                             + req.params.address).status(400).end()
-            device.remove(function(err) {
-                if (err) res.send(err);
-                console.log('Slettede DEVICE med adresse: ' + req.params.address);
-                res.status(200).end();
-            });
+            } else {
+                device.remove(function(err) {
+                    if (err) res.send(err);
+                    console.log('Slettede DEVICE med adresse: ' + req.params.address);
+                    res.status(200).end();
+                });
+            }
         });
     });
 
@@ -103,4 +107,3 @@ module.exports = function(app) {
         res.sendfile(path.join(__dirname + '/../public/index.html'));
     });
 }
-

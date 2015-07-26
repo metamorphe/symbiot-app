@@ -25,7 +25,7 @@ deviceSchema.methods.update = function(newJson) {
     if (oldBrightness != this.brightness) {
         this.serialSetBrightness(this.brightness);
     }
-    console.log('Changed to: ' + this.brightness);
+    console.log(this.address + ': ' + oldBrightness + ' -> ' + this.brightness);
 };
 
 deviceSchema.methods.serialSetBrightness = function(brightness) {
