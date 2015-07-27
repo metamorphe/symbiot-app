@@ -1,0 +1,28 @@
+{
+  "name": "SymbIoT",
+  "version": "1.0.0",
+  "homepage": "https://github.com/metamorphe/symbiot-app",
+  "authors": [
+    "Jasper O'Leary <jhaazpr@gmail.com>"
+  ],
+  "description": "Frontend dependencies for the SymbIoT interface",
+  "main": "app.js, index.html",
+  "moduleType": [
+    "node"
+  ],
+  "license": "Simplified BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-bootstrap": "~0.13.0",
+    "angular-ui-router": "~0.2.15",
+    "angular": "~1.4.3",
+    "bootstrap": "~3.3.5",
+    "jquery": "~2.1.4"
+  }
+}
