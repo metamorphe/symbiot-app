@@ -4,13 +4,21 @@ angular.module('mapModule')
                      'UserMedia',
                      function($scope, $sce, nodeService, behaviorService,
                               UserMedia) {
-    $scope.pointMenu= {
+    $scope.pointMenu = {
         content: 'Lorem Ipsum',
         templateUrl: '../views/_pointMenu.html',
         title: 'Actuator Options'
     };
 
-    $scope.pointQueue = [];
+    /* Expose behaviorService static functions */
+    $scope.nodeQueue = behaviorService.nodeQueue;
+    $scope.addPointToQueue = behaviorService.addPointToQueue;
+    $scope.deletePointFromQueue = behaviorService.deletePointFromQueue;
+
+    $scope.distBehaviors = {
+        lineFill: behaviorService.lineFill
+    };
+
     $scope.points = $scope.points || {};
     nodeService.getNodes(function(data) {
         angular.forEach(data, function (value, key, object) {

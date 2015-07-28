@@ -8,12 +8,14 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
         $stateProvider
             .state('click', {
                 url: '/click',
-                controller: 'mapController',
                 templateUrl: '../views/behaviors/_click.html'
             })
             .state('lineFill', {
                 url: '/lineFill',
-                controller: 'mapController',
                 templateUrl: '../views/behaviors/_lineFill.html'
+            })
+            .state('followTheLeader', {
+                url: '/followTheLeader',
+                templateUrl: '../views/behaviors/_followTheLeader.html'
             });
     });

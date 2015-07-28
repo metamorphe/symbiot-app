@@ -8,10 +8,9 @@
     <title>Node Control</title>
     <link href="./css/style.css" rel="stylesheet"/>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="./assets/bower_components/jquery/dist/jquery.min.js"></script>
     <script src="./assets/bower_components/angular/angular.js"></script>
     <script src="./assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="./assets/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
@@ -26,8 +25,8 @@
   </head>
   <body ng-app="symbiotApp">
     <div ng-controller="mapController" class="map-container container">
-        <!-- <a ui-sref="click">Click</a>
-        <a ui-sref="lineFill">lineFill</a> -->
+        <a ui-sref="click">Click</a>
+        <a ui-sref="lineFill">lineFill</a>
         <div class="row no-gutter">
             <div class="toolbar col-md-2">
                 <img src="./img/toolbar_mock.png"
@@ -37,6 +36,7 @@
             <map name="toolbar-map">
                 <area shape="square" coords="10,35,45,65" ui-sref="click" />
                 <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
+                <area shape="square" coords="10,130,45,160" ui-sref="followTheLeader" />
                 <area shape="square" coords="50,130,85,160" />
             </map>
             <div ui-view class="map col-md-10"></div>

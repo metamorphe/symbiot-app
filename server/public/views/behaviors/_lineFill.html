@@ -15,6 +15,14 @@
          </div>
     </div>
     <div ng-repeat="point in points track by $index">
-        <point x="{{point.x}}" y="{{point.y}}"></point>
+        <point ng-mouseover=""
+               ng-click="addPointToQueue(point, null)"
+               x="{{point.x}}"
+               y="{{point.y}}"></point>
+    </div>
+    <div class="row">
+        <div ng-bind="nodeQueue"></div>
+        <button ng-click="distBehaviors.lineFill(nodeQueue, behaviors.toggle.lambda)"
+                class="btn btn-default">Go</button>
     </div>
 </div>
