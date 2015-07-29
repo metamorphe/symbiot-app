@@ -11,9 +11,10 @@ angular.module('mapModule')
     };
 
     /* Expose behaviorService static functions */
-    $scope.nodeQueue = behaviorService.nodeQueue;
+    $scope.nodeQueue = $scope.nodeQueue || [];
     $scope.addPointToQueue = behaviorService.addPointToQueue;
     $scope.deletePointFromQueue = behaviorService.deletePointFromQueue;
+    $scope.clearQueue = behaviorService.clearQueue;
 
     $scope.distBehaviors = {
         lineFill: behaviorService.lineFill
