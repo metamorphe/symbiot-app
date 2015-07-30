@@ -17,7 +17,9 @@ angular.module('mapModule')
     $scope.clearQueue = behaviorService.clearQueue;
 
     $scope.distBehaviors = {
-        lineFill: behaviorService.lineFill
+        lineFill: behaviorService.lineFill,
+        followTheLeader: behaviorService.followTheLeader,
+        _reverseBrightness: behaviorService._reverseBrightness
     };
 
     $scope.points = $scope.points || {};

@@ -25,32 +25,43 @@ angular.module('behaviorModule')
         nodeArr.splice(0, nodeArr.length)
     };
 
+    this._reverseBrightness = function(point) {
+        point.brightness = (point.brightness === 0)
+            ? 100
+            : 0;
+    };
+
     this.lineFill = function(nodeArr, actuateFn) {
         /* Assumes 'toggle' point behavior */
+        var that = this;
         (function lambda(idx) {
             setTimeout(function() {
                 actuateFn(nodeArr[idx]);
-                nodeArr[idx].brightness = (nodeArr[idx].brightness == 0)
-                    ? 100
-                    : 0 //FIXME: kludgy
+                that._reverseBrightness(nodeArr[idx]);
                 if (++idx < nodeArr.length)
                     lambda(idx);
-            }, 1000);
+            }, 500);
         })(0);
     };
 
     this.followTheLeader = function(nodeArr, actuateFn) {
         /* Assumes 'toggle' point behavior */
+        var that = this;
         (function lambda(idx) {
             setTimeout(function() {
                 actuateFn(nodeArr[idx]);
-                if (idx + 1 < nodeArr.length)
-                    actuateFn(nodeArr[idx + 1]);
-                if (idx - 2 >= 0)
-                    actuateFn(nodeArr[idx - 2]);
-                if (++idx < nodeArr.length)
+                that._reverseBrightness(nodeArr[idx]);
+                if (idx - 1 >= 0) {
+                    actuateFn(nodeArr[idx - 1]);
+                    that._reverseBrightness(nodeArr[idx - 1]);
+                }
+                if (++idx < nodeArr.length) {
                     lambda(idx);
-            }, 1000);
+                } else {
+                    actuateFn(nodeArr[idx - 1]);
+                    that._reverseBrightness(nodeArr[idx - 1]);
+                }
+            }, 500);
         })(0);
     };
 }]);

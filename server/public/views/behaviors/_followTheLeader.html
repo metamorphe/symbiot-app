@@ -1,0 +1,35 @@
+<h3>followTheLeader</h3>
+
+<div ng-controller="mapController" class="map-container">
+    <div>
+    <!-- <img src="../../img/wall_formation.JPG"
+         class="img-responsive"
+         ng-right-click="addPoint()"> -->
+         <div class="embed-responsive embed-responsive-4by3">
+             <video id="gum-local"
+                    class="embed-responsive-item"
+                    ng-src="{{videostream}}"
+                    ng-init="captureVideo()"
+                    ng-right-click="addPoint()"
+                    autoplay></video>
+         </div>
+    </div>
+    <div ng-repeat="point in points track by $index">
+        <point ng-mouseover=""
+               ng-click="addPointToQueue(point, nodeQueue, null, points)"
+               id="{{point._id}}"
+               x="{{point.x}}"
+               y="{{point.y}}"></point>
+    </div>
+    <div class="row">
+        <div ng-repeat="node in nodeQueue track by $index">
+            {{node.address}}
+        </div>
+    </div>
+    <div class="btn-group row">
+        <label class="btn btn-default"
+               ng-click="distBehaviors.followTheLeader(nodeQueue, behaviors.toggle.lambda)">Actuate</label>
+        <label class="btn btn-default"
+               ng-click="clearQueue(nodeQueue)">Clear Selection</label>
+    </div>
+</div>

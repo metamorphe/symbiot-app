@@ -25,8 +25,6 @@
   </head>
   <body ng-app="symbiotApp">
     <div ng-controller="mapController" class="map-container container">
-        <a ui-sref="click">Click</a>
-        <a ui-sref="lineFill">lineFill</a>
         <div class="row no-gutter">
             <div class="toolbar col-md-2">
                 <img src="./img/toolbar_mock.png"
@@ -36,8 +34,8 @@
             <map name="toolbar-map">
                 <area shape="square" coords="10,35,45,65" ui-sref="click" />
                 <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
-                <area shape="square" coords="10,130,45,160" ui-sref="followTheLeader" />
-                <area shape="square" coords="50,130,85,160" />
+                <area shape="square" coords="50,130,85,160" ui-sref="followTheLeader"/>
+                <area shape="square" coords="10,70,45,90" ui-sref="burst"/>
             </map>
             <div ui-view class="map col-md-10"></div>
         </div>

@@ -17,5 +17,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
             .state('followTheLeader', {
                 url: '/followTheLeader',
                 templateUrl: '../views/behaviors/_followTheLeader.html'
+            })
+            .state('burst', {
+                url: '/burst',
+                templateUrl: '../views/behaviors/_burst.html'
             });
     });
