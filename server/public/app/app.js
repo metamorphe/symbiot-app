@@ -6,6 +6,10 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
     .config(function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/click');
         $stateProvider
+            .state('sandbox', {
+                url: '/sandbox',
+                templateUrl: '../views/behaviors/_sandbox.html'
+            })
             .state('click', {
                 url: '/click',
                 templateUrl: '../views/behaviors/_click.html'
