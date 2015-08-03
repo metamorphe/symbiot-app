@@ -22,6 +22,7 @@
     <script src="./app/map/pointMenuDirective.js"></script>
     <script src="./app/map/ngRightClickDirective.js"></script>
     <script src="./app/behavior/behaviorService.js"></script>
+    <script src="./assets/bower_components/paper/dist/paper-full.js"></script>
   </head>
   <body ng-app="symbiotApp">
     <div ng-controller="mapController" class="map-container container">
@@ -48,6 +49,9 @@
                    ng-click="deletePoints()">Clear All</label>
         </div>
     </div>
+
+    <canvas id="thatCanvas" width="300" height="300"></canvas>
+
 
   </body>
 </html>
