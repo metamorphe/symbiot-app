@@ -3,19 +3,33 @@
     <div class="form-group">
         <label>Selection</label>
         <br>
-        <select ng-model="blockForm.selection">
+        <select ng-model="blockForm.selectionName">
+            <option ng-repeat="(name, items) in selections" 
+                    ng-value="name">{{name}}</option>
+        </select>
+        <br>
+        <label>Trigger</label>
+        <br>
+        <select ng-model="blockForm.triggerName">
+            <option ng-repeat="(name, lambda) in triggers" 
+                    ng-value="name">{{name}}</option>
+        </select>
+        <br>
+        <label>Trigger Object</label>
+        <br>
+        <select ng-model="blockForm.triggerObjectName">
             <option ng-repeat="(name, items) in selections" 
                     ng-value="name">{{name}}</option>
         </select>
         <br>
         <label>Behavior</label>
         <br>
-        <select ng-model="blockForm.behavior">
+        <select ng-model="blockForm.behaviorName">
             <option ng-repeat="(name, lambda) in behaviors" 
                     ng-value="name">{{name}}</option>
         </select>
         <br>
-        <button ng-click="addBlock(blockForm.selection, blockForm.behavior)"
+        <button ng-click="addBlock(blockForm)"
                 class="btn btn-default">
             Create
         </button>

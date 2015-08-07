@@ -14,8 +14,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                 controller: function($scope) {
                     $scope.blockMenuTemplateUrl = '../views/_blockMenu.html';
                     $scope.defaultColor = '#e9e9ff';
-
-                    $scope.selections = {};
+                    
+                    /* SELECTION LOGIC */
+                    $scope.selections = { nothing: [] };
                     $scope.addSelection = function(name, items) {
                         $scope.selections[name] = items;
                     };
@@ -25,23 +26,82 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             item.selected = true;
                         });
                     };
+
+                    /* TRIGGER LOGIC */
+                    $scope.triggers = {
+                        onClick: function(triggerItem) {
+                            //TODO: if trigger item clicked, actuate behavior on selection
+                        },
+                        onDrag: function(triggerItem) {
+                            //TODO: if trigger region dragged, actuate 
+                        },
+                        afterPrevious: function(previousBlock) {
+                            //TODO: must define a previous block, as a trigger object
+                            //and after it sactuation, actuate this block
+                        }
+                    };
+
+                    /* BEHAVIOR LOGIC */
                     $scope.behaviors = {
                         turnOn: function(item) {
-                            item.fillColor = 'red';
+                            item.fillColor.alpha = 1.0;
                         },
                         turnOff: function(item) {
+                            item.fillColor.alpha = 0.0;
+                        },
+                        turnHalfway: function(item) {
                             item.fillColor = $scope.defaultColor;
                         },
                         toggle: function(item) {
-                            //TODO
+                            if (item.fillColor.alpha === 1.0)
+                                item.fillColor.alpha = 0.0;
+                            else
+                                item.fillColor.alpha = 1.0;
                         },
-                        clickToggle: function(item) {
-                            //TODO
+                        fadeOn: function(item) {
+                            var i = 0;
+                            item.fillColor.alpha = 0.0;
+                            var interval = setInterval(function() {
+                                if (i < 50)
+                                    item.fillColor.alpha += 0.02;
+                                else
+                                    clearInterval(interval);
+                                i++;
+                            }, 16); //Approximately 60 FPS
                         },
-                        mouseoverToggle: function(item) {
-                            //TODO
+                        fadeOff: function(item) {
+                            var i = 0;
+                            item.fillColor.alpha = 1.0;
+                            var interval = setInterval(function() {
+                                if (i < 50)
+                                    item.fillColor.alpha -= 0.02;
+                                else
+                                    clearInterval(interval);
+                                i++;
+                            }, 16); //Approximately 60 FPS
+                        },
+                        fadeToggle: function(item) {
+                            if (item.fillColor.alpha === 1.0)
+                                $scope.behaviors['fadeOff'](item);
+                            else
+                                $scope.behaviors['fadeOn'](item);
+                        },
+                        sine: function(item) {
+                            var i = 0;
+                            item.fillColor.alpha = 1.0;
+                            var interval = setInterval(function() {
+                                if (i < 50)
+                                    item.fillColor.alpha -= 0.02;
+                                else if (i < 100)
+                                    item.fillColor.alpha += 0.02;
+                                else
+                                    clearInterval(interval);
+                                i++;
+                            }, 16); //Approximately 60 FPS
                         }
                     };
+
+                    /* BLOCK LOGIC */
                     $scope.blockActuate = function(block) {
                         var selection = $scope.selections[block.selectionName];
                         var behavior = $scope.behaviors[block.behaviorName]; 
@@ -56,12 +116,19 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
 
                     $scope.blocks = {};
                     $scope.blockId = 0;
-                    $scope.blockForm = { selection: '', behavior: 'turnOn' };
-                    $scope.addBlock = function(selectionName, behaviorName) {
+                    $scope.blockForm = {
+                        selectionName: 'nothing',
+                        triggerName: 'afterPrevious',
+                        triggerObjectName: 'nothing',
+                        behaviorName: 'turnOn'
+                    };
+                    $scope.addBlock = function(blockForm) {
                         $scope.blocks[$scope.blockId] = {
                             id: $scope.blockId,
-                            selectionName: selectionName,
-                            behaviorName: behaviorName
+                            selectionName: blockForm.selectionName,
+                            triggerName: blockForm.triggerName,
+                            triggerObjectName: blockForm.triggerObjectName,
+                            behaviorName: blockForm.behaviorName
                         };
                         $scope.blockId++;
                     };
@@ -127,9 +194,6 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
 
                             var onKeyDown = function(event) {
                                 switch (event.key) {
-                                    case 'p':
-                                        console.log(project.activeLayer);
-                                        break;
                                     case 'a':
                                         project.selectAll();
                                         break;

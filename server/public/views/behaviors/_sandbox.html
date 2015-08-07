@@ -18,14 +18,21 @@
         <canvas id="myCanvas" style="height:300px;"></canvas>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <h5>Selections</h5>
             <ul>
                 <li ng-repeat="(name, list) in selections"
                     ng-click="selectSelection(name)">{{name}}</li>
             </ul>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
+            <h5>Triggers</h5>
+            <ul>
+                <li ng-repeat="(name, lambda) in triggers"]
+                    ng-click="">{{name}}</li>
+            </ul>
+        </div>
+        <div class="col-md-2">
             <h5>Behaviors</h5>
             <ul>
                 <li ng-repeat="(name, lambda) in behaviors"]
@@ -42,7 +49,10 @@
             <ul>
                 <li ng-repeat="block in blocks"]
                     ng-click="">
-                    {{block.selectionName}} --&gt; {{block.behaviorName}}
+                    <code>
+                        $({{block.triggerObjectName}}).{{block.triggerName}}
+                        ({{block.behaviorName}}({{block.selectionName}}));
+                    </code>
                     <a href="" ng-click="blockActuate(block)">Actuate</a>
                     <a href="" ng-click="blockDelete(block)">Delete</a>
                 </li>
