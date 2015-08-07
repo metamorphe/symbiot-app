@@ -1,5 +1,6 @@
-angular.module('mapModule', ['behaviorModule']);
+angular.module('mapModule', ['behaviorModule', 'paperModule']);
 angular.module('behaviorModule', []);
+angular.module('paperModule', []);
 
 var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                                 'ui.router'])
@@ -9,12 +10,65 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
             .state('sandbox', {
                 url: '/sandbox',
                 templateUrl: '../views/behaviors/_sandbox.html',
+                //controller: 'paperController' //FIXME: keeps complaining
                 controller: function($scope) {
-                    $scope.placeTool = null;
-                    $scope.pathTool = null;
+                    $scope.blockMenuTemplateUrl = '../views/_blockMenu.html';
+                    $scope.defaultColor = '#e9e9ff';
+
+                    $scope.selections = {};
+                    $scope.addSelection = function(name, items) {
+                        $scope.selections[name] = items;
+                    };
+                    $scope.selectSelection = function(name) {
+                        project.deselectAll();
+                        $scope.selections[name].forEach(function(item) {
+                            item.selected = true;
+                        });
+                    };
+                    $scope.behaviors = {
+                        turnOn: function(item) {
+                            item.fillColor = 'red';
+                        },
+                        turnOff: function(item) {
+                            item.fillColor = $scope.defaultColor;
+                        },
+                        toggle: function(item) {
+                            //TODO
+                        },
+                        clickToggle: function(item) {
+                            //TODO
+                        },
+                        mouseoverToggle: function(item) {
+                            //TODO
+                        }
+                    };
+                    $scope.blockActuate = function(block) {
+                        var selection = $scope.selections[block.selectionName];
+                        var behavior = $scope.behaviors[block.behaviorName]; 
+                        selection.forEach(function(item) {
+                            behavior(item);
+                        });
+                    };
+                    $scope.blockDelete = function(block) {
+                        $scope.selections[block.selectionName] = $scope.defaultColor;
+                        delete $scope.blocks[block.id];
+                    };
+
+                    $scope.blocks = {};
+                    $scope.blockId = 0;
+                    $scope.blockForm = { selection: '', behavior: 'turnOn' };
+                    $scope.addBlock = function(selectionName, behaviorName) {
+                        $scope.blocks[$scope.blockId] = {
+                            id: $scope.blockId,
+                            selectionName: selectionName,
+                            behaviorName: behaviorName
+                        };
+                        $scope.blockId++;
+                    };
+
+                    /* Main paper logic */
                     $scope.$on('$viewContentLoaded',
                         function(event, viewConfig) {
-                            //TODO: move this somewhere else
                             /* Setup */
                             paper.install(window);
                             paper.setup('myCanvas');
@@ -34,12 +88,11 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             view.viewSize = new Size(width, height);
 
                             /* Main */
-                            var lightBlue = '#e9e9ff';
                             var hitOptions = {
-                            	segments: true,
-                            	stroke: true,
-                            	fill: true,
-                            	tolerance: 5
+                                segments: true,
+                                stroke: true,
+                                fill: true,
+                                tolerance: 5
                             };
 
                             var recent, path, actuating;
@@ -51,7 +104,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 if (!hitResult) {
                                     var point = new Point(event.point);
                                     var circle = new Path.Circle(point, 20);
-                                    circle.fillColor = lightBlue;
+                                    circle.fillColor = $scope.defaultColor;
                                     circle.selected = true;
                                     recent = circle;
                                     $scope.nodeGroup.addChild(circle);
@@ -60,17 +113,17 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         if (event.item)
                                             event.item.remove();
                                     } else {
-                                        event.item.selected = true;
-                                        recent = event.item;
+                                        hitResult.item.selected = true;
+                                        recent = hitResult.item;
                                     }
                                 }
-                            }
+                            };
 
                             $scope.placeTool.onMouseDrag = function(event) {
                                 if (recent) {
                                     recent.position = recent.position.add(event.delta);
                                 }
-                            }
+                            };
 
                             var onKeyDown = function(event) {
                                 switch (event.key) {
@@ -80,13 +133,13 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     case 'a':
                                         project.selectAll();
                                         break;
-                                    case 'a':
-                                        actuating = true;
+                                    case 'enter':
+                                        var name = prompt("Enter a name for this selection.");
+                                        $scope.addSelection(name, project.selectedItems);
                                         break;
                                     case 'backspace':
                                         event.preventDefault();
                                         event.stopPropagation();
-                                    case 'd':
                                         project.selectedItems.forEach(function(v) {
                                             v.remove();
                                         });
@@ -95,28 +148,31 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         project.deselectAll();
                                         break;
                                     default:
-                                        console.log(event.key);
+                                        break;
                                 }
-                            }
+                            };
 
                             $scope.placeTool.onKeyDown = onKeyDown;
                             $scope.pathTool.onKeyDown = onKeyDown;
 
                             $scope.pathTool.onMouseDown = function(event) {
-                            	// Create a new path and give it a stroke color:
-                            	path = new Path();
-                            	path.strokeColor = '#00000';
+                                project.deselectAll();
+                                // Create a new path and give it a stroke color:
+                                path = new Path();
+                                path.strokeColor = '#F1C40F';
+                                path.strokeWidth = 10;
 
-                            	// Add a segment to the path where
-                            	// you clicked:
-                            	path.add(event.point);
-                            }
+                                // Add a segment to the path where
+                                // you clicked:
+                                path.add(event.point);
+                            };
 
                             $scope.pathTool.onMouseDrag = function(event) {
-                            	// Every drag event, add a segment
-                            	// to the path at the position of the mouse:
-                            	path.add(event.point);
-                            }
+                                // Every drag event, add a segment
+                                // to the path at the position of the mouse:
+                                path.add(event.point);
+                                path.smooth();
+                            };
 
                             $scope.pathTool.onMouseUp = function(event) {
                                 var intersections = [];
@@ -130,7 +186,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     hitResult.item.selected = true;
                                 }
                                 path.remove();
-                            }
+                            };
 
                             view.onFrame = function(event) {
                                 if (actuating) {
@@ -139,7 +195,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         actuating = false;
                                     }
                                 }
-                            }
+                            };
                         });
                 }
             })

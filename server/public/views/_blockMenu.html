@@ -1,0 +1,23 @@
+<div type="text/ng-template">
+    <div>Content goes here</div>
+    <div class="form-group">
+        <label>Selection</label>
+        <br>
+        <select ng-model="blockForm.selection">
+            <option ng-repeat="(name, items) in selections" 
+                    ng-value="name">{{name}}</option>
+        </select>
+        <br>
+        <label>Behavior</label>
+        <br>
+        <select ng-model="blockForm.behavior">
+            <option ng-repeat="(name, lambda) in behaviors" 
+                    ng-value="name">{{name}}</option>
+        </select>
+        <br>
+        <button ng-click="addBlock(blockForm.selection, blockForm.behavior)"
+                class="btn btn-default">
+            Create
+        </button>
+    </div>
+</div>

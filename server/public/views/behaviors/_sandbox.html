@@ -1,6 +1,6 @@
 <h3>This is the <code>Paper.js</code> Sandbox</h3>
 
-<div ng-controller="mapController" class="map-container">
+<div class="map-container">
     <!-- <img src="../../img/wall_formation.JPG"
          class="img-responsive"
          ng-right-click="addPoint()"> -->
@@ -17,10 +17,36 @@
     <div class="row">
         <canvas id="myCanvas" style="height:300px;"></canvas>
     </div>
-    <div class="btn-group row">
-        <label class="btn btn-default"
-               ng-click="distBehaviors.lineFill(nodeQueue, behaviors.toggle.lambda)">Actuate</label>
-        <label class="btn btn-default"
-               ng-click="clearQueue(nodeQueue)">Clear Selection</label>
+    <div class="row">
+        <div class="col-md-4">
+            <h5>Selections</h5>
+            <ul>
+                <li ng-repeat="(name, list) in selections"
+                    ng-click="selectSelection(name)">{{name}}</li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h5>Behaviors</h5>
+            <ul>
+                <li ng-repeat="(name, lambda) in behaviors"]
+                    ng-click="">{{name}}</li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h5>Blocks</h5>
+            <button class="btn btn-default"
+                    popover-template="blockMenuTemplateUrl"
+                    popover-title="New Block"
+                    popover-placement="right"
+                    popover-trigger="click">New Block</button>
+            <ul>
+                <li ng-repeat="block in blocks"]
+                    ng-click="">
+                    {{block.selectionName}} --&gt; {{block.behaviorName}}
+                    <a href="" ng-click="blockActuate(block)">Actuate</a>
+                    <a href="" ng-click="blockDelete(block)">Delete</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
