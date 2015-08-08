@@ -29,16 +29,32 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
 
                     /* TRIGGER LOGIC */
                     $scope.triggers = {
-                        onClick: function(triggerItem) {
-                            //TODO: if trigger item clicked, actuate behavior on selection
+                        onClick: function(triggerItem, blockId) {
+                            return function(event) {
+                                var hitResult;
+                                triggerItem.forEach(function(item) {
+                                    hitResult = item.hitTest(event.point);
+                                    if (hitResult) {
+                                        $scope.blockActuate($scope.blocks[blockId]);
+                                    }
+                                });
+                            };
                         },
-                        onDrag: function(triggerItem) {
+                        onDrag: function(triggerItem, blockId) {
                             //TODO: if trigger region dragged, actuate 
                         },
-                        afterPrevious: function(previousBlock) {
+                        afterPrevious: function(previousBlock, blockId) {
                             //TODO: must define a previous block, as a trigger object
                             //and after it sactuation, actuate this block
                         }
+                    };
+                    $scope.triggerHandlers = {
+                    };
+                    $scope.addTrigger = function(triggerObjectName,
+                                            triggerName, blockId) {
+                        $scope.triggerHandlers[blockId] =
+                            $scope.triggers[triggerName](
+                                    $scope.selections[triggerObjectName], blockId);
                     };
 
                     /* BEHAVIOR LOGIC */
@@ -134,6 +150,8 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             triggerObjectName: blockForm.triggerObjectName,
                             behaviorName: blockForm.behaviorName
                         };
+                        $scope.addTrigger(blockForm.triggerObjectName,
+                                            blockForm.triggerName, $scope.blockId);
                         $scope.blockId++;
                     };
 
@@ -143,7 +161,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             /* Setup */
                             paper.install(window);
                             paper.setup('myCanvas');
-                            $scope.selectTool = new Tool();
+                            $scope.interactTool = new Tool();
                             $scope.placeTool = new Tool();
                             $scope.pathTool = new Tool();
                             $scope.nodeGroup = new Group();
@@ -219,7 +237,8 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         break;
                                 }
                             };
-
+                            
+                            $scope.interactTool.onKeyDown = onKeyDown;
                             $scope.placeTool.onKeyDown = onKeyDown;
                             $scope.pathTool.onKeyDown = onKeyDown;
 
@@ -254,6 +273,12 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     hitResult.item.selected = true;
                                 }
                                 path.remove();
+                            };
+
+                            $scope.interactTool.onMouseDown = function(event) {
+                                for (handlerName in $scope.triggerHandlers) {
+                                   $scope.triggerHandlers[handlerName](event);
+                                };
                             };
 
                             view.onFrame = function(event) {
