@@ -62,8 +62,8 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             var i = 0;
                             item.fillColor.alpha = 0.0;
                             var interval = setInterval(function() {
-                                if (i < 50)
-                                    item.fillColor.alpha += 0.02;
+                                if (i < 25)
+                                    item.fillColor.alpha += 0.04;
                                 else
                                     clearInterval(interval);
                                 i++;
@@ -73,8 +73,8 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             var i = 0;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
-                                if (i < 50)
-                                    item.fillColor.alpha -= 0.02;
+                                if (i < 25)
+                                    item.fillColor.alpha -= 0.04;
                                 else
                                     clearInterval(interval);
                                 i++;
@@ -90,10 +90,14 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             var i = 0;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
-                                if (i < 50)
-                                    item.fillColor.alpha -= 0.02;
+                                if (i < 25)
+                                    item.fillColor.alpha -= 0.04;
+                                else if (i < 50)
+                                    item.fillColor.alpha += 0.04;
+                                else if (i < 75)
+                                    item.fillColor.alpha -= 0.04;
                                 else if (i < 100)
-                                    item.fillColor.alpha += 0.02;
+                                    item.fillColor.alpha += 0.04;
                                 else
                                     clearInterval(interval);
                                 i++;
@@ -110,7 +114,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         });
                     };
                     $scope.blockDelete = function(block) {
-                        $scope.selections[block.selectionName] = $scope.defaultColor;
+                        $scope.selections[block.selectionName].alpha = 1.0;
                         delete $scope.blocks[block.id];
                     };
 
