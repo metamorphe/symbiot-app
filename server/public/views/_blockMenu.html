@@ -19,7 +19,11 @@
         <br>
         <select ng-model="blockForm.triggerObjectName">
             <option ng-repeat="(name, items) in selections" 
+                    ng-if="blockForm.triggerName !== 'afterPrevious'"
                     ng-value="name">{{name}}</option>
+            <option ng-repeat="(id, blocks) in blocks"
+                    ng-if="blockForm.triggerName === 'afterPrevious'"
+                    ng-value="id">Block {{id}}</option>
         </select>
         <br>
         <label>Behavior</label>

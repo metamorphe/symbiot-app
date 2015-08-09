@@ -42,19 +42,54 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         },
                         onDrag: function(triggerItem, blockId) {
                             //TODO: if trigger region dragged, actuate 
+                            return function(event) {
+                                var hitResult;
+                                triggerItem.forEach(function(item) {
+                                    hitResult = item.hitTest(event.point);
+                                    if (hitResult) {
+                                        $scope.blockActuate($scope.blocks[blockId]);
+                                    }
+                                });
+                            };
                         },
                         afterPrevious: function(previousBlock, blockId) {
                             //TODO: must define a previous block, as a trigger object
                             //and after it sactuation, actuate this block
+                            /* Add the next block to the next field of PREVIOUS_BLOCK */
+                            previousBlock.next = blockId;
+                            return function() {
+                                //TODO: enforce actuation only after asynchronous completion
+                                console.log("Warning: afterPrevious actuation is currently not timed properly");
+                                $scope.blockActuate($scope.blocks[blockId]);
+                            };
                         }
                     };
-                    $scope.triggerHandlers = {
-                    };
+                    $scope.triggerMouseDownHandlers = {};
+                    $scope.triggerMouseDragHandlers = {};
+                    $scope.triggerMouseUpHandlers = {};
+                    $scope.triggerOrderHandlers = {};
                     $scope.addTrigger = function(triggerObjectName,
                                             triggerName, blockId) {
-                        $scope.triggerHandlers[blockId] =
-                            $scope.triggers[triggerName](
-                                    $scope.selections[triggerObjectName], blockId);
+                        var handlerDict, triggerObj;
+                        switch (triggerName) {
+                            case 'onClick':
+                                handlerDict = $scope.triggerMouseDownHandlers;
+                                triggerObj = $scope.selections[triggerObjectName];
+                                break;
+                            case 'onDrag':
+                                handlerDict = $scope.triggerMouseDragHandlers;
+                                triggerObj = $scope.selections[triggerObjectName];
+                                break;
+                            case 'afterPrevious':
+                                handlerDict = $scope.triggerOrderHandlers;
+                                triggerObj = $scope.blocks[triggerObjectName];
+                                break;
+                            default:
+                                throw new Error('Error: no handler list for this triggerItem');
+
+                        }
+                        handlerDict[blockId] =
+                            $scope.triggers[triggerName](triggerObj, blockId);
                     };
 
                     /* BEHAVIOR LOGIC */
@@ -73,6 +108,25 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 item.fillColor.alpha = 0.0;
                             else
                                 item.fillColor.alpha = 1.0;
+                        },
+                        flash: function(item) {
+                            var i = 0;
+                            item.fillColor.alpha = 1.0;
+                            var interval = setInterval(function() {
+                                if (i < 25)
+                                    item.fillColor.alpha = 1.0;
+                                else if (i < 50)
+                                    item.fillColor.alpha = 0.0;
+                                else if (i < 75)
+                                    item.fillColor.alpha = 1.0
+                                else if (i < 100)
+                                    item.fillColor.alpha = 0.0;
+                                else {
+                                    clearInterval(interval);
+                                    item.fillColor.alpha = 1.0;
+                                }
+                                i++;
+                            }, 16); //Approximately 60 FPS
                         },
                         fadeOn: function(item) {
                             var i = 0;
@@ -128,6 +182,13 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         selection.forEach(function(item) {
                             behavior(item);
                         });
+
+                        /* If there is a next block to actuate, it will be contained
+                         * in $scope.triggerOrderHandlers with the next block's 
+                         * ID field as the key for the handler function. */
+                        if (block.next && block.next in $scope.triggerOrderHandlers) {
+                            $scope.triggerOrderHandlers[block.next]();
+                        }
                     };
                     $scope.blockDelete = function(block) {
                         $scope.selections[block.selectionName].alpha = 1.0;
@@ -148,7 +209,8 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             selectionName: blockForm.selectionName,
                             triggerName: blockForm.triggerName,
                             triggerObjectName: blockForm.triggerObjectName,
-                            behaviorName: blockForm.behaviorName
+                            behaviorName: blockForm.behaviorName,
+                            next: null
                         };
                         $scope.addTrigger(blockForm.triggerObjectName,
                                             blockForm.triggerName, $scope.blockId);
@@ -276,8 +338,19 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             };
 
                             $scope.interactTool.onMouseDown = function(event) {
-                                for (handlerName in $scope.triggerHandlers) {
-                                   $scope.triggerHandlers[handlerName](event);
+                                project.deselectAll();
+                                for (handlerName in $scope.triggerMouseDownHandlers) {
+                                   $scope.triggerMouseDownHandlers[handlerName](event);
+                                };
+                            };
+                            $scope.interactTool.onMouseDrag = function(event) {
+                                for (handlerName in $scope.triggerMouseDragHandlers) {
+                                   $scope.triggerMouseDragHandlers[handlerName](event);
+                                };
+                            };
+                            $scope.interactTool.onMouseUp = function(event) {
+                                for (handlerName in $scope.triggerUpHandlers) {
+                                   $scope.triggerMouseUpHandlers[handlerName](event);
                                 };
                             };
 
