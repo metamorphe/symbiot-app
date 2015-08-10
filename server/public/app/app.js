@@ -14,17 +14,35 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                 controller: function($scope) {
                     $scope.blockMenuTemplateUrl = '../views/_blockMenu.html';
                     $scope.defaultColor = '#e9e9ff';
+                    $scope.colorHexes = ['#e74c3c', '#e67e22', '#f1c40f',
+                        '#1abc9c', '#2ecc71', '#3498db', '#9b59b6',
+                        '#34495e', '#95a5a6'];
+                    $scope.colorIndex = 0;
                     
                     /* SELECTION LOGIC */
                     $scope.selections = { nothing: [] };
                     $scope.addSelection = function(name, items) {
                         $scope.selections[name] = items;
+                        var color = $scope.colorHexes[$scope.colorIndex++
+                                % $scope.colorHexes.length];
+                        items.forEach(function(item) {
+                            item.fillColor = color;
+                            item.strokeColor = color;
+                            item.shadowColor = color;
+                            item.shadowBlur = 20;
+                        });
+                        $scope.selectionToColorMap[name] = color;
                     };
                     $scope.selectSelection = function(name) {
                         project.deselectAll();
                         $scope.selections[name].forEach(function(item) {
                             item.selected = true;
                         });
+                    };
+                    $scope.selectionToColorMap = {};
+                    $scope.selectionNameToColor = function(name) {
+                        //return '{ \'background-color\' : \'' + $scope.selectionToColorMap[name] + '\'}';
+                        return $scope.selectionToColorMap[name];
                     };
 
                     /* TRIGGER LOGIC */
@@ -113,13 +131,13 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             var i = 0;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
-                                if (i < 25)
+                                if (i < 10)
                                     item.fillColor.alpha = 1.0;
-                                else if (i < 50)
+                                else if (i < 20)
                                     item.fillColor.alpha = 0.0;
-                                else if (i < 75)
+                                else if (i < 30)
                                     item.fillColor.alpha = 1.0
-                                else if (i < 100)
+                                else if (i < 40)
                                     item.fillColor.alpha = 0.0;
                                 else {
                                     clearInterval(interval);
@@ -257,15 +275,22 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 var hitResult = project.hitTest(event.point, hitOptions);
                                 if (!hitResult) {
                                     var point = new Point(event.point);
-                                    var circle = new Path.Circle(point, 20);
-                                    circle.fillColor = $scope.defaultColor;
+                                    var color = $scope.colorHexes[$scope.colorIndex++
+                                            % $scope.colorHexes.length];
+                                    var circle = new Path.Circle({
+                                        center: point,
+                                        radius: 20,
+                                        strokeColor: $scope.defaultColor,
+                                        strokeWidth: 1,
+                                        fillColor: $scope.defaultColor
+                                    });
                                     circle.selected = true;
                                     recent = circle;
                                     $scope.nodeGroup.addChild(circle);
                                 } else {
                                     if (event.modifiers.shift) {
                                         if (event.item)
-                                            event.item.remove();
+                                            event.item.selected = true;
                                     } else {
                                         hitResult.item.selected = true;
                                         recent = hitResult.item;

@@ -45,54 +45,56 @@
 
 <div id="sidebar" class="col-xs-3">
                
-                        <ul class="list-group">
-                            <li class="list-group-item active">
-                                <h6 class="list-group-item-heading">Selections
-                                   <span class="pull-right glyphicon glyphicon-refresh"></span>
-                                </h6>
-                            </li>
-                            <li class="list-group-item"
-                                ng-repeat="(name, list) in selections"
-                                ng-click="selectSelection(name)">{{name}}</li>
-                        </ul>
-                     
-                        <ul class="list-group">
-                            <li class="list-group-item active">
-                                <h6 class="list-group-item-heading">Triggers</h6>
-                            </li>
-                             <li class="list-group-item"
-                                    ng-repeat="(name, lambda) in triggers"]
-                                ng-click="">{{name}}</li>
-                        </ul>
-                     
-                        <ul class="list-group">
-                             <li class="list-group-item active">
-                                <h6 class="list-group-item-heading">Behaviors</h>
-                            </li>
-                             <li class="list-group-item"
-                                    ng-repeat="(name, lambda) in behaviors"]
-                                ng-click="">{{name}}</li>
-                        </ul>   
-
-
-                     
-                        <button class="btn btn-sm btn-primary"
-                                popover-template="blockMenuTemplateUrl"
-                                popover-title="New Block"
-                                popover-placement="right"
-                                popover-trigger="click">New Block</button>
-                        <br>
-                         <br>
-                        <ul class="list-group">
-                            <li class="list-group-item"
-                                ng-repeat="block in blocks"]
-                                ng-click="">
-                                <code>
-                                    $({{block.triggerObjectName}}).{{block.triggerName}}
-                                    ({{block.behaviorName}}({{block.selectionName}}));
-                                </code>
-                                <a href="" ng-click="blockActuate(block)">Actuate</a>
-                                <a href="" ng-click="blockDelete(block)">Delete</a>
-                            </li>
-                        </ul>
+    <ul class="list-group">
+        <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Selections
+               <span class="pull-right glyphicon glyphicon-refresh"></span>
+            </h6>
+        </li>
+        <li class="list-group-item"
+            ng-repeat="(name, list) in selections"
+            ng-style="{ 'background-color' : selectionNameToColor(name)}"
+            ng-click="selectSelection(name)">{{name}}</li>
+    </ul>
+    
+    <ul class="list-group">
+        <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Triggers</h6>
+        </li>
+         <li class="list-group-item"
+                ng-repeat="(name, lambda) in triggers"]
+            ng-click="">{{name}}</li>
+    </ul>
+    
+    <ul class="list-group">
+         <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Behaviors</h>
+        </li>
+         <li class="list-group-item"
+                ng-repeat="(name, lambda) in behaviors"]
+            ng-click="">{{name}}</li>
+    </ul>   
+    
+    <button class="btn btn-sm btn-primary"
+            popover-template="blockMenuTemplateUrl"
+            popover-title="New Block"
+            popover-placement="right"
+            popover-trigger="click">New Block</button>
+    <br>
+     <br>
+    <ul class="list-group">
+        <li class="list-group-item"
+            ng-repeat="block in blocks"]
+            ng-click="">
+            <!-- <code>
+                $({{block.triggerObjectName}}).{{block.triggerName}}
+                ({{block.behaviorName}}({{block.selectionName}}));
+            </code> -->
+            [{{block.id}}]
+            If {{block.triggerName}} of {{block.triggerObjectName}},
+            then {{block.behaviorName}} {{block.selectionName}}
+            <a href="" ng-click="blockActuate(block)">Actuate</a>
+            <a href="" ng-click="blockDelete(block)">Delete</a>
+        </li>
+    </ul>
 </div>
