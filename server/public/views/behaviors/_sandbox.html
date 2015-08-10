@@ -1,10 +1,36 @@
-<h3>This is the <code>Paper.js</code> Sandbox</h3>
+<div class="paper-toolbar row">
+    <div class="btn-group">
+        
+        <button class="btn btn-sm btn-primary" ng-click="placeTool.activate();">
+         <span class="glyphicon glyphicon-edit"> </span>
+            Place
+        </button>
+        
+        <button class="btn btn-sm btn-danger" ng-click="pathTool.activate();">
+         <span class="glyphicon glyphicon-edit"> </span>
+            Path
+        </button>
+        
+        <button class="btn btn-sm btn-warning" ng-click="interactTool.activate();">
+         <span class="glyphicon glyphicon-edit"> </span>
+            Interact
+        </button>
+    
+    </div>
+    <!-- <div class="btn-group row">
+        <label class="btn btn-default"
+               ng-click="sendPoints()">Create Nodes</label>
+        <label class="btn btn-danger"
+               ng-click="deletePoints()">Clear All</label>
+    </div> -->
+</div>
 
-<div class="map-container">
-    <!-- <img src="../../img/wall_formation.JPG"
-         class="img-responsive"
-         ng-right-click="addPoint()"> -->
-    <!--     <div class="embed-responsive embed-responsive-4by3">
+<div class="canvas-container row">
+    <img src="../../img/wall_formation.JPG"
+         class="map-img img-responsive"
+         ng-right-click="">
+    <canvas id="myCanvas" class="paper-canvas"></canvas>
+    <!-- <div class="embed-responsive embed-responsive-4by3">
         <video id="gum-local"
                class="embed-responsive-item"
                ng-src="{{videostream}}"
@@ -12,52 +38,46 @@
                ng-right-click="addPoint()"
                autoplay></video>
     </div> -->
-    <a href="" ng-click="placeTool.activate();">Place</a>
-    <a href="" ng-click="pathTool.activate();">Path</a>
-    <a href="" ng-click="interactTool.activate();">Interact</a>
-    <div class="row">
-        <canvas id="myCanvas" style="height:300px;"></canvas>
+</div>
+<div class="control-panel row">
+    <div class="control-lists col-xs-3">
+        <h5>Selections</h5>
+        <ul>
+            <li ng-repeat="(name, list) in selections"
+                ng-click="selectSelection(name)">{{name}}</li>
+        </ul>
     </div>
-    <div class="row">
-        <div class="col-md-2">
-            <h5>Selections</h5>
-            <ul>
-                <li ng-repeat="(name, list) in selections"
-                    ng-click="selectSelection(name)">{{name}}</li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <h5>Triggers</h5>
-            <ul>
-                <li ng-repeat="(name, lambda) in triggers"]
-                    ng-click="">{{name}}</li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <h5>Behaviors</h5>
-            <ul>
-                <li ng-repeat="(name, lambda) in behaviors"]
-                    ng-click="">{{name}}</li>
-            </ul>
-        </div>
-        <div class="col-md-4">
-            <h5>Blocks</h5>
-            <button class="btn btn-default"
-                    popover-template="blockMenuTemplateUrl"
-                    popover-title="New Block"
-                    popover-placement="right"
-                    popover-trigger="click">New Block</button>
-            <ul>
-                <li ng-repeat="block in blocks"]
-                    ng-click="">
-                    <code>
-                        $({{block.triggerObjectName}}).{{block.triggerName}}
-                        ({{block.behaviorName}}({{block.selectionName}}));
-                    </code>
-                    <a href="" ng-click="blockActuate(block)">Actuate</a>
-                    <a href="" ng-click="blockDelete(block)">Delete</a>
-                </li>
-            </ul>
-        </div>
+    <div class="control-lists col-xs-2">
+        <h5>Triggers</h5>
+        <ul>
+            <li ng-repeat="(name, lambda) in triggers"]
+                ng-click="">{{name}}</li>
+        </ul>
+    </div>
+    <div class="control-lists col-xs-3">
+        <h5>Behaviors</h5>
+        <ul>
+            <li ng-repeat="(name, lambda) in behaviors"]
+                ng-click="">{{name}}</li>
+        </ul>
+    </div>
+    <div class="control-lists col-xs-4">
+        <h5>Blocks</h5>
+        <button class="btn btn-default"
+                popover-template="blockMenuTemplateUrl"
+                popover-title="New Block"
+                popover-placement="right"
+                popover-trigger="click">New Block</button>
+        <ul>
+            <li ng-repeat="block in blocks"]
+                ng-click="">
+                <code>
+                    $({{block.triggerObjectName}}).{{block.triggerName}}
+                    ({{block.behaviorName}}({{block.selectionName}}));
+                </code>
+                <a href="" ng-click="blockActuate(block)">Actuate</a>
+                <a href="" ng-click="blockDelete(block)">Delete</a>
+            </li>
+        </ul>
     </div>
 </div>

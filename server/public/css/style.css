@@ -1,10 +1,21 @@
 /* Angular.UI routing fix */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
+.clearfix {
+    clear: both;
+}
+
 /* Bootstrap Gutter Removal */
 .row.no-gutter {
   margin-left: 0;
   margin-right: 0;
+}
+
+.no-gutter {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .row.no-gutter [class*='col-']:not(:first-child),
@@ -56,3 +67,60 @@
     padding: 15px;
     margin-right: 10px;
 }
+
+
+.map-img {
+    z-index: 0;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+}
+
+
+body, html, .page-container{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.toolbar{
+    background: #494949;
+    height: 100%;
+}
+/* SANDBOX STYLING */
+.paper-toolbar{
+    background: #494949;
+    height: 50px;
+    padding: 8px;
+}
+.canvas-container {
+    position: relative;
+    background-color: blue;
+    width: 100%;
+    height: 600px;  /* canvas and paper height */
+    overflow: hidden;
+}
+    .canvas-container img{
+        height: 100%;
+    }
+    .paper-canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1;
+        height: 100%;
+    }
+
+    .control-panel {
+        z-index: 2;
+        height: calc(100% - 650px);
+    }
+        .control-lists{
+            height: 100px;
+        }
+        .control-lists ul{
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+

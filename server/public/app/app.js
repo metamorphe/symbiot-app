@@ -59,7 +59,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             previousBlock.next = blockId;
                             return function() {
                                 //TODO: enforce actuation only after asynchronous completion
-                                console.log("Warning: afterPrevious actuation is currently not timed properly");
+                                //console.log("Warning: afterPrevious actuation is currently not timed properly");
                                 $scope.blockActuate($scope.blocks[blockId]);
                             };
                         }
@@ -187,7 +187,10 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                          * in $scope.triggerOrderHandlers with the next block's 
                          * ID field as the key for the handler function. */
                         if (block.next && block.next in $scope.triggerOrderHandlers) {
-                            $scope.triggerOrderHandlers[block.next]();
+                            var timeout = setTimeout(function() {
+                                $scope.triggerOrderHandlers[block.next]();
+                                clearTimeout(timeout);
+                            }, 1000);
                         }
                     };
                     $scope.blockDelete = function(block) {
