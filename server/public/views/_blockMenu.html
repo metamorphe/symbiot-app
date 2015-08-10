@@ -1,23 +1,26 @@
 <div type="text/ng-template">
     <div>Content goes here</div>
     <div class="form-group">
-        <label>Selection</label>
-        <br>
-        <select ng-model="blockForm.selectionName">
+        <label class="label-sm">Selection</label>
+
+        <select class="form-control form-control-sm"
+                ng-model="blockForm.selectionName">
             <option ng-repeat="(name, items) in selections" 
                     ng-value="name">{{name}}</option>
         </select>
-        <br>
-        <label>Trigger</label>
-        <br>
-        <select ng-model="blockForm.triggerName">
+
+
+        <label class="label-sm">Trigger</label>
+        <select class="form-control form-control-sm"
+                ng-model="blockForm.triggerName">
             <option ng-repeat="(name, lambda) in triggers" 
                     ng-value="name">{{name}}</option>
         </select>
-        <br>
-        <label>Trigger Object</label>
-        <br>
-        <select ng-model="blockForm.triggerObjectName">
+        
+
+        <label class="label-sm">Trigger Object</label>
+        <select class="form-control form-control-sm"
+                ng-model="blockForm.triggerObjectName">
             <option ng-repeat="(name, items) in selections" 
                     ng-if="blockForm.triggerName !== 'afterPrevious'"
                     ng-value="name">{{name}}</option>
@@ -25,16 +28,17 @@
                     ng-if="blockForm.triggerName === 'afterPrevious'"
                     ng-value="id">Block {{id}}</option>
         </select>
-        <br>
-        <label>Behavior</label>
-        <br>
-        <select ng-model="blockForm.behaviorName">
+
+
+        <label class="label-sm">Behavior</label>
+        <select class="form-control form-control-sm"
+                ng-model="blockForm.behaviorName">
             <option ng-repeat="(name, lambda) in behaviors" 
                     ng-value="name">{{name}}</option>
         </select>
         <br>
         <button ng-click="addBlock(blockForm)"
-                class="btn btn-default">
+                class="btn btn-sm btn-primary">
             Create
         </button>
     </div>

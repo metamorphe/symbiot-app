@@ -25,9 +25,15 @@
     <script src="./assets/bower_components/paper/dist/paper-full.js"></script>
   </head>
   <body ng-app="symbiotApp">
-    <div ng-controller="mapController" class="page-container col-xs-12 no-gutter">
-            <div class="toolbar col-xs-2 no-gutter">
-                <img src="./img/toolbar_mock.png"
+    <div ng-controller="mapController" id="page">
+            <div ui-view class="map">
+
+            </div>
+            
+                    
+                    
+                    
+               <!--  <img src="./img/toolbar_mock.png"
                      usemap="#toolbar-map">
                      <map name="toolbar-map">
                         <area shape="square" coords="10,35,45,65" ui-sref="click" />
@@ -35,9 +41,8 @@
                         <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
                         <area shape="square" coords="50,130,85,160" ui-sref="followTheLeader"/>
                         <area shape="square" coords="10,70,45,90" ui-sref="burst"/>
-                    </map>
+                   -->  <!-- </map> -->
             </div>
-            <div ui-view class="map col-xs-10 no-gutter"></div>
     </div>
 
   </body>
