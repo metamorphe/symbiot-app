@@ -39,10 +39,17 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         '#34495e', '#95a5a6'];
                     $scope.colorIndex = 0;
                     $scope.addSelection = function(name, items) {
-                        //TODO: if selection already exists...
-                        $scope.selections[name] = items;
-                        var color = $scope.colorHexes[$scope.colorIndex++
-                                % $scope.colorHexes.length];
+                        if ($scope.selections[name]) {
+                            /* Adding to an existing selection */
+                            $scope.selections[name] = $scope.selections[name].concat(items);
+                            var color = $scope.selectionToColorMap[name];
+                        } else {
+                            /* Create a new selection */
+                            $scope.selections[name] = items;
+                            var color = $scope.colorHexes[$scope.colorIndex++
+                                    % $scope.colorHexes.length];
+                            $scope.selectionToColorMap[name] = color;
+                        }
                         items.forEach(function(item) {
                             item.fillColor = color;
                             item.fillColor.alpha = 0.0;
@@ -50,7 +57,6 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             item.shadowColor = color;
                             item.shadowBlur = 20;
                         });
-                        $scope.selectionToColorMap[name] = color;
                     };
                     $scope.selectSelection = function(name) {
                         project.deselectAll();
@@ -68,7 +74,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         delete $scope.selections[name];
                     };
                     $scope.deleteAllSelections = function() {
-                        for (selectionName in Object.keys($scope.selections)) {
+                        for (selectionName in $scope.selections) {
                             $scope.deleteSelection(selectionName);
                         };
                         $scope.selections = { none: [] };
@@ -112,13 +118,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             };
                         },
                         afterPrevious: function(previousBlock, blockId) {
-                            //TODO: must define a previous block, as a trigger object
-                            //and after it sactuation, actuate this block
                             /* Add the next block to the next field of PREVIOUS_BLOCK */
                             previousBlock.next = blockId;
                             return function() {
-                                //TODO: enforce actuation only after asynchronous completion
-                                //console.log("Warning: afterPrevious actuation is currently not timed properly");
                                 $scope.blockActuate($scope.blocks[blockId]);
                             };
                         }
@@ -150,6 +152,28 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         handlerDict[blockId] =
                             $scope.triggers[triggerName](triggerObj, blockId);
                     };
+                    $scope.removeBlockTrigger = function(block) {
+                        var triggerObj;
+                        switch (block.triggerName) {
+                            case 'onClick':
+                                handlerDict = $scope.triggerMouseDownHandlers;
+                                triggerObj = $scope.selections[block.triggerObjectName];
+                                break;
+                            case 'onDrag':
+                                handlerDict = $scope.triggerMouseDragHandlers;
+                                triggerObj = $scope.selections[block.triggerObjectName];
+                                break;
+                            case 'afterPrevious':
+                                handlerDict = $scope.triggerOrderHandlers;
+                                triggerObj = $scope.blocks[block.triggerObjectName];
+                                break;
+                            default:
+                                throw new Error('Error: no handler list for this triggerItem');
+
+                        }
+                        delete handlerDict[block.id];
+                    };
+
 
                     /* BEHAVIOR LOGIC */
                     $scope.behaviors = {
@@ -162,6 +186,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         //turnHalfway: function(item) {
                         //    item.fillColor = $scope.defaultColor;
                         //},
+                        doNothing: function(item) {},
                         toggle: function(item) {
                             if (item.fillColor.alpha === 1.0)
                                 item.fillColor.alpha = 0.0;
@@ -273,24 +298,15 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             }, 1000);
                         }
                     };
-                    $scope.blockEdit = function(block) {
-                        //TODO
-                    };
-                    $scope.blockDelete = function(block) {
-                        //TODO: go through all other blocks that have this after previous
-                        //and invalidate them
-                        delete $scope.blocks[block.id];
-                    };
-
                     $scope.blocks = {};
                     $scope.blockId = 0;
                     $scope.blockForm = {
                         selectionName: 'none',
                         triggerName: 'onClick',
-                        triggerObjectName: 'nothing',
-                        behaviorName: 'turnOn'
+                        triggerObjectName: 'none',
+                        behaviorName: 'doNothing'
                     };
-                    $scope.addBlock = function(blockForm) {
+                    $scope.blockAdd = function(blockForm) {
                         $scope.blocks[$scope.blockId] = {
                             id: $scope.blockId,
                             selectionName: blockForm.selectionName,
@@ -302,6 +318,24 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         $scope.addTrigger(blockForm.triggerObjectName,
                                             blockForm.triggerName, $scope.blockId);
                         $scope.blockId++;
+                    };
+                    $scope.blockEdit = function(block) {
+                        $scope.removeBlockTrigger(block);
+                        $scope.addTrigger(block.triggerObjectName,
+                                            block.triggerName, block.id);
+                    };
+                    $scope.blockDelete = function(block) {
+                        //TODO: go through all other blocks that have this after previous
+                        //and invalidate them
+                        var _blockRecursiveDeleteNext = function(block) {
+                            if (block.next)
+                                _blockRecursiveDeleteNext($scope.blocks[block.next]);
+                            block.triggerObjectName = 'none';
+                            block.next = null;
+                        };
+                        _blockRecursiveDeleteNext(block);
+                        $scope.removeBlockTrigger(block);
+                        delete $scope.blocks[block.id];
                     };
 
                     /* Main paper logic */
