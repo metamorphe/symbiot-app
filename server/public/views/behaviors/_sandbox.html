@@ -1,44 +1,49 @@
 <div class="map col-xs-9">
-    <div class="paper-toolbar row">
+    <div class="paper-toolbar row clearfix">
         <div class="btn-group">
-            
-            <a class="btn btn-sm btn-primary" ng-click="placeTool.activate();" href="">
-             <span class="glyphicon glyphicon-circle-arrow-down"> </span>
+            <a class="btn btn-sm btn-primary" ng-click="placeTool.activate()" href="">
+                <span class="glyphicon glyphicon-circle-arrow-down"></span>
                 Place
             </a>
-            
-            <a class="btn btn-sm btn-danger" ng-click="pathTool.activate();" href="">
-             <span class="glyphicon glyphicon-edit"> </span>
+            <a class="btn btn-sm btn-danger" ng-click="pathTool.activate()" href="">
+                <span class="glyphicon glyphicon-edit"></span>
                 Path
             </a>
-            
-            <a class="btn btn-sm btn-warning" ng-click="interactTool.activate();" href="">
-             <span class="glyphicon glyphicon-hand-up"> </span>
+            <a class="btn btn-sm btn-warning" ng-click="interactTool.activate()" href="">
+                <span class="glyphicon glyphicon-hand-up"></span>
                 Interact
             </a>
-        
         </div>
-        <!-- <div class="btn-group row">
-            <label class="btn btn-default"
-                   ng-click="sendPoints()">Create Nodes</label>
-            <label class="btn btn-danger"
-                   ng-click="deletePoints()">Clear All</label>
-        </div> -->
+        <div class="btn-group pull-right">
+            <button class="btn btn-sm btn-default"
+                    btn-radio="'Virtual'"
+                    ng-model="viewSettings.viewMode">Virtual</button>
+            <button class="btn btn-sm btn-default"
+                    btn-radio="'Physical'"
+                    ng-model="viewSettings.viewMode">Physical</button>
+        </div>
+        <select class="pull-right"
+                ng-model="viewSettings.background">
+            <option ng-repeat="(name, src) in backgrounds" 
+                    ng-value="src">{{name}}</option>
+        </select>
     </div>
 
     <div class="canvas-container row">
-        <img src="../../img/wall_formation.JPG"
+        <canvas id="myCanvas" class="paper-canvas"></canvas>
+        <img ng-show="viewSettings.viewMode === viewModes.virtual"
+             ng-src="{{viewSettings.background}}"
              class="map-img img-responsive"
              ng-right-click="">
-        <canvas id="myCanvas" class="paper-canvas"></canvas>
-        <!-- <div class="embed-responsive embed-responsive-4by3">
+        <div ng-show="viewSettings.viewMode === viewModes.physical" 
+             class="map-img embed-responsive embed-responsive-4by3">
             <video id="gum-local"
                    class="embed-responsive-item"
                    ng-src="{{videostream}}"
                    ng-init="captureVideo()"
                    ng-right-click="addPoint()"
                    autoplay></video>
-        </div> -->
+        </div>
     </div>
 </div>
 
@@ -54,10 +59,15 @@
         <li class="list-group-item"
             ng-repeat="(name, list) in selections"
             ng-style="{ 'background-color' : selectionNameToColor(name)}"
-            ng-click="selectSelection(name)">{{name}}</li>
+            ng-click="selectSelection(name)">
+            {{name}}
+           <span class="pull-right glyphicon glyphicon-remove"
+                 ng-click="alert('hi')"></span>
+        </li>
     </ul>
     
-    <ul class="list-group">
+    <ul class="list-group"
+        ng-show="usingInteractTool()">
         <li class="list-group-item active">
             <h6 class="list-group-item-heading">Triggers</h6>
         </li>
@@ -66,7 +76,8 @@
             ng-click="">{{name}}</li>
     </ul>
     
-    <ul class="list-group">
+    <ul class="list-group"
+        ng-show="usingInteractTool()">
          <li class="list-group-item active">
             <h6 class="list-group-item-heading">Behaviors</h>
         </li>
@@ -74,15 +85,19 @@
                 ng-repeat="(name, lambda) in behaviors"]
             ng-click="">{{name}}</li>
     </ul>   
-    
+    <button class="btn btn-sm btn-danger"
+            ng-show="!usingInteractTool()">Clear All</button> 
+
     <button class="btn btn-sm btn-primary"
+            ng-show="usingInteractTool()"
             popover-template="blockMenuTemplateUrl"
             popover-title="New Block"
             popover-placement="right"
             popover-trigger="click">New Block</button>
     <br>
      <br>
-    <ul class="list-group">
+    <ul class="list-group"
+        ng-show="usingInteractTool()">
         <li class="list-group-item"
             ng-repeat="block in blocks"]
             ng-click="">
@@ -93,7 +108,9 @@
             [{{block.id}}]
             If {{block.triggerName}} of {{block.triggerObjectName}},
             then {{block.behaviorName}} {{block.selectionName}}
-            <a href="" ng-click="blockActuate(block)">Actuate</a>
+            <br>
+            <a href="" ng-click="blockActuate(block)">Test</a>
+            <a href="" ng-click="blockEdit(block)">Edit</a>
             <a href="" ng-click="blockDelete(block)">Delete</a>
         </li>
     </ul>

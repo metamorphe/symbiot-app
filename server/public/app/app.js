@@ -5,28 +5,47 @@ angular.module('paperModule', []);
 var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                                 'ui.router'])
     .config(function($stateProvider, $urlRouterProvider) {
-        $urlRouterProvider.otherwise('/click');
+        $urlRouterProvider.otherwise('/sandbox');
         $stateProvider
             .state('sandbox', {
                 url: '/sandbox',
                 templateUrl: '../views/behaviors/_sandbox.html',
                 //controller: 'paperController' //FIXME: keeps complaining
                 controller: function($scope) {
+                    /* META LOGIC */
                     $scope.blockMenuTemplateUrl = '../views/_blockMenu.html';
+                    $scope.usingInteractTool = function() {
+                        return paper.tool === $scope.interactTool;
+                    };
+                    /* Note that these URLs are relative to the 'calling' page */
+                    $scope.backgrounds = {
+                        facade: '../../img/wall_formation.JPG',
+                        spatial: '../../img/spatial_room.jpg'
+                    };
+                    $scope.viewModes = {
+                        virtual: 'Virtual',
+                        physical: 'Physical'
+                    };
+                    $scope.viewSettings = {
+                        viewMode: $scope.viewModes.virtual,
+                        background: $scope.backgrounds.facade
+                    };
+                    
+                    /* SELECTION LOGIC */
+                    $scope.selections = { none: [] };
                     $scope.defaultColor = '#e9e9ff';
                     $scope.colorHexes = ['#e74c3c', '#e67e22', '#f1c40f',
                         '#1abc9c', '#2ecc71', '#3498db', '#9b59b6',
                         '#34495e', '#95a5a6'];
                     $scope.colorIndex = 0;
-                    
-                    /* SELECTION LOGIC */
-                    $scope.selections = { nothing: [] };
                     $scope.addSelection = function(name, items) {
+                        //TODO: if selection already exists...
                         $scope.selections[name] = items;
                         var color = $scope.colorHexes[$scope.colorIndex++
                                 % $scope.colorHexes.length];
                         items.forEach(function(item) {
                             item.fillColor = color;
+                            item.fillColor.alpha = 0.0;
                             item.strokeColor = color;
                             item.shadowColor = color;
                             item.shadowBlur = 20;
@@ -112,15 +131,15 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
 
                     /* BEHAVIOR LOGIC */
                     $scope.behaviors = {
-                        turnOn: function(item) {
-                            item.fillColor.alpha = 1.0;
-                        },
-                        turnOff: function(item) {
-                            item.fillColor.alpha = 0.0;
-                        },
-                        turnHalfway: function(item) {
-                            item.fillColor = $scope.defaultColor;
-                        },
+                        //turnOn: function(item) {
+                        //    item.fillColor.alpha = 1.0;
+                        //},
+                        //turnOff: function(item) {
+                        //    item.fillColor.alpha = 0.0;
+                        //},
+                        //turnHalfway: function(item) {
+                        //    item.fillColor = $scope.defaultColor;
+                        //},
                         toggle: function(item) {
                             if (item.fillColor.alpha === 1.0)
                                 item.fillColor.alpha = 0.0;
@@ -129,6 +148,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         },
                         flash: function(item) {
                             var i = 0;
+                            var beginningAlpha = item.fillColor.alpha;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
                                 if (i < 10)
@@ -141,41 +161,59 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     item.fillColor.alpha = 0.0;
                                 else {
                                     clearInterval(interval);
-                                    item.fillColor.alpha = 1.0;
+                                    item.fillColor.alpha = beginningAlpha;
                                 }
                                 i++;
                             }, 16); //Approximately 60 FPS
                         },
-                        fadeOn: function(item) {
-                            var i = 0;
-                            item.fillColor.alpha = 0.0;
-                            var interval = setInterval(function() {
-                                if (i < 25)
-                                    item.fillColor.alpha += 0.04;
-                                else
-                                    clearInterval(interval);
-                                i++;
-                            }, 16); //Approximately 60 FPS
-                        },
-                        fadeOff: function(item) {
-                            var i = 0;
-                            item.fillColor.alpha = 1.0;
-                            var interval = setInterval(function() {
-                                if (i < 25)
-                                    item.fillColor.alpha -= 0.04;
-                                else
-                                    clearInterval(interval);
-                                i++;
-                            }, 16); //Approximately 60 FPS
-                        },
+                        //fadeOn: function(item) {
+                        //    var i = 0;
+                        //    item.fillColor.alpha = 0.0;
+                        //    var interval = setInterval(function() {
+                        //        if (i < 25)
+                        //            item.fillColor.alpha += 0.04;
+                        //        else
+                        //            clearInterval(interval);
+                        //        i++;
+                        //    }, 16); //Approximately 60 FPS
+                        //},
+                        //fadeOff: function(item) {
+                        //    var i = 0;
+                        //    item.fillColor.alpha = 1.0;
+                        //    var interval = setInterval(function() {
+                        //        if (i < 25)
+                        //            item.fillColor.alpha -= 0.04;
+                        //        else
+                        //            clearInterval(interval);
+                        //        i++;
+                        //    }, 16); //Approximately 60 FPS
+                        //},
                         fadeToggle: function(item) {
-                            if (item.fillColor.alpha === 1.0)
-                                $scope.behaviors['fadeOff'](item);
-                            else
-                                $scope.behaviors['fadeOn'](item);
+                            if (item.fillColor.alpha === 1.0) {
+                                var i = 0;
+                                item.fillColor.alpha = 1.0;
+                                var interval = setInterval(function() {
+                                    if (i < 25)
+                                        item.fillColor.alpha -= 0.04;
+                                    else
+                                        clearInterval(interval);
+                                    i++;
+                                }, 16); //Approximately 60 FPS
+                            } else {
+                                var i = 0;
+                                item.fillColor.alpha = 0.0;
+                                var interval = setInterval(function() {
+                                    if (i < 25)
+                                        item.fillColor.alpha += 0.04;
+                                    else
+                                        clearInterval(interval);
+                                    i++;
+                                }, 16); //Approximately 60 FPS
+                            }
                         },
                         sine: function(item) {
                             var i = 0;
+                            var beginningAlpha = item.fillColor.alpha;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
                                 if (i < 25)
@@ -186,8 +224,10 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     item.fillColor.alpha -= 0.04;
                                 else if (i < 100)
                                     item.fillColor.alpha += 0.04;
-                                else
+                                else {
                                     clearInterval(interval);
+                                    item.fillColor.alpha = beginningAlpha;
+                                }
                                 i++;
                             }, 16); //Approximately 60 FPS
                         }
@@ -211,16 +251,20 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             }, 1000);
                         }
                     };
+                    $scope.blockEdit = function(block) {
+                        //TODO
+                    };
                     $scope.blockDelete = function(block) {
-                        $scope.selections[block.selectionName].alpha = 1.0;
+                        //TODO: go through all other blocks that have this after previous
+                        //and invalidate them
                         delete $scope.blocks[block.id];
                     };
 
                     $scope.blocks = {};
                     $scope.blockId = 0;
                     $scope.blockForm = {
-                        selectionName: 'nothing',
-                        triggerName: 'afterPrevious',
+                        selectionName: 'none',
+                        triggerName: 'onClick',
                         triggerObjectName: 'nothing',
                         behaviorName: 'turnOn'
                     };
@@ -247,13 +291,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             $scope.interactTool = new Tool();
                             $scope.placeTool = new Tool();
                             $scope.pathTool = new Tool();
-                            $scope.nodeGroup = new Group();
+                            $scope.placeTool.activate();
 
-                            var textItem = new PointText({
-                                content: 'textItem goes here',
-                                point: new Point(20, 30),
-                                fillColor: 'black'
-                            });
+                            $scope.nodeGroup = new Group();
 
                             var height = document.getElementById('myCanvas').height;
                             var width = document.getElementById('myCanvas').width;
@@ -281,9 +321,10 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         center: point,
                                         radius: 20,
                                         strokeColor: $scope.defaultColor,
-                                        strokeWidth: 1,
-                                        fillColor: $scope.defaultColor
+                                        strokeWidth: 5,
+                                        fillColor: $scope.defaultColor,
                                     });
+                                    circle.fillColor.alpha = 0.0;
                                     circle.selected = true;
                                     recent = circle;
                                     $scope.nodeGroup.addChild(circle);
