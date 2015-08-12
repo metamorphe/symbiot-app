@@ -58,9 +58,31 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             item.selected = true;
                         });
                     };
+                    $scope.deleteSelection = function(name) {
+                        $scope.selections[name].forEach(function(item) {
+                            var beginningAlpha = item.fillColor.alpha;
+                            item.fillColor = $scope.defaultColor;
+                            item.fillColor.alpha = beginningAlpha;
+                            item.strokeColor = $scope.defaultColor;
+                        });
+                        delete $scope.selections[name];
+                    };
+                    $scope.deleteAllSelections = function() {
+                        for (selectionName in Object.keys($scope.selections)) {
+                            $scope.deleteSelection(selectionName);
+                        };
+                        $scope.selections = { none: [] };
+                    };
+                    $scope.deleteAllNodes = function() {
+                        for (selection in $scope.selections) {
+                            $scope.selections[selection].forEach(function(item) {
+                                item.remove();
+                            });
+                        };
+                        $scope.selections = { none: [] };
+                    };
                     $scope.selectionToColorMap = {};
                     $scope.selectionNameToColor = function(name) {
-                        //return '{ \'background-color\' : \'' + $scope.selectionToColorMap[name] + '\'}';
                         return $scope.selectionToColorMap[name];
                     };
 

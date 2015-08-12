@@ -62,7 +62,7 @@
             ng-click="selectSelection(name)">
             {{name}}
            <span class="pull-right glyphicon glyphicon-remove"
-                 ng-click="alert('hi')"></span>
+                 ng-click="deleteSelection(name)"></span>
         </li>
     </ul>
     
@@ -85,8 +85,14 @@
                 ng-repeat="(name, lambda) in behaviors"]
             ng-click="">{{name}}</li>
     </ul>   
+
+    <button class="btn btn-sm btn-warning"
+            ng-click="deleteAllSelections()"
+            ng-show="!usingInteractTool()">Clear All Selections</button> 
+
     <button class="btn btn-sm btn-danger"
-            ng-show="!usingInteractTool()">Clear All</button> 
+            ng-click="deleteAllNodes()"
+            ng-show="!usingInteractTool()">Clear Everything</button> 
 
     <button class="btn btn-sm btn-primary"
             ng-show="usingInteractTool()"
