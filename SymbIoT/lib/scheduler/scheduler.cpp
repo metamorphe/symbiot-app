@@ -1,5 +1,5 @@
 #include "scheduler.h"
-//Scheduling variables 
+//Scheduling variables
 // 12 is the maximum length of a decimal representation of a 32-bit integer,
 // including space for a leading minus sign and terminating null byte
 char scheduler_buffer[12];
@@ -47,7 +47,7 @@ void schedulder_parse_key_value(char* serial_buffer, size_t size, uint16_t this_
 void scheduler_process(String keyData, String valueData, uint16_t this_node){
     unsigned int n = keyData.length() + 1;
     keyData.toCharArray(scheduler_buffer, n);
-   
+
     int key = atoi(scheduler_buffer);
 
     /* Convert ASCII-encoded integer to an int */
@@ -57,7 +57,7 @@ void scheduler_process(String keyData, String valueData, uint16_t this_node){
 
     /* Resolve address (address space is base 16) */
     int board = key / 16;
-    int addr = key % 16;
+    int addr = key;
     Serial.print("Sending to ");
     Serial.print(addr);
     Serial.print(" with value ");
@@ -66,4 +66,3 @@ void scheduler_process(String keyData, String valueData, uint16_t this_node){
     /* Send to network */
     command_set_intensity ((uint16_t) addr, this_node, value);
 }
-

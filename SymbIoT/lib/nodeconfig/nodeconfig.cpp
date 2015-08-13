@@ -22,11 +22,11 @@ const uint8_t valid_eeprom_flag = 0xdf;
 const uint16_t node_address_set[16] =
 {
   00,
-  01, 011, 021,
-  02, 012, 022,
-  03, 013, 023,
-  04, 014, 024,
-  05, 015, 025
+  01, 011, 012,
+  02, 021, 022,
+  03, 031, 032,
+  04, 041, 042,
+  05, 051, 052
 };
 
 uint8_t nodeconfig_read(void)

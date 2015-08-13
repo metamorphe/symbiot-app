@@ -1,0 +1,174 @@
+<div class="map col-xs-9">
+    <div class="paper-toolbar row clearfix">
+        <div class="btn-group">
+            <a id="place-btn" class="btn btn-sm btn-primary" ng-click="placeTool.activate()" href="">
+                <span class="glyphicon glyphicon-circle-arrow-down"></span>
+                Place
+            </a>
+            <a class="btn btn-sm btn-danger" ng-click="pathTool.activate()" href="">
+                <span class="glyphicon glyphicon-edit"></span>
+                Path
+            </a>
+            <a class="btn btn-sm btn-warning" ng-click="interactTool.activate()" href="">
+                <span class="glyphicon glyphicon-hand-up"></span>
+                Interact
+            </a>
+        </div>
+        <div class="btn-group pull-right">
+            <button class="btn btn-sm btn-default"
+                    btn-radio="'Virtual'"
+                    ng-model="viewSettings.viewMode">Virtual</button>
+            <button class="btn btn-sm btn-default"
+                    btn-radio="'Physical'"
+                    ng-model="viewSettings.viewMode">Physical</button>
+        </div>
+        <select class="pull-right"
+                ng-model="viewSettings.background">
+            <option ng-repeat="(name, src) in backgrounds" 
+                    ng-value="src">{{name}}</option>
+        </select>
+        <button class="pull-right" ng-click="addPhysicalNodes()">Add Physical Nodes</button>
+    </div>
+
+    <div class="canvas-container row">
+        <canvas id="myCanvas" class="paper-canvas"></canvas>
+        <img ng-show="viewSettings.viewMode === viewModes.virtual"
+             ng-src="{{viewSettings.background}}"
+             class="map-img img-responsive"
+             ng-right-click="">
+        <div ng-show="viewSettings.viewMode === viewModes.physical" 
+             class="map-img embed-responsive embed-responsive-4by3">
+            <video id="gum-local"
+                   class="embed-responsive-item"
+                   ng-src="{{videostream}}"
+                   ng-init="captureVideo()"
+                   ng-right-click="addPoint()"
+                   autoplay></video>
+        </div>
+    </div>
+</div>
+
+
+<div id="sidebar" class="col-xs-3">
+               
+    <ul class="list-group">
+        <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Selections
+               <span class="pull-right glyphicon glyphicon-refresh"></span>
+            </h6>
+        </li>
+        <li class="list-group-item"
+            ng-repeat="(name, list) in selections"
+            ng-style="{ 'background-color' : selectionNameToColor(name)}"
+            ng-click="selectSelection(name)">
+            {{name}}
+           <span class="pull-right glyphicon glyphicon-remove"
+                 ng-show="name !== 'none'"
+                 ng-click="deleteSelection(name)"></span>
+        </li>
+    </ul>
+    
+    <!-- <ul class="list-group"
+        ng-show="usingInteractTool()">
+        <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Triggers</h6>
+        </li>
+         <li class="list-group-item"
+                ng-repeat="(name, lambda) in triggers"]
+            ng-click="">{{name}}</li>
+    </ul> -->
+    
+    <!-- <ul class="list-group"
+        ng-show="usingInteractTool()">
+         <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Behaviors</h>
+        </li>
+         <li class="list-group-item"
+                ng-repeat="(name, lambda) in behaviors"]
+            ng-click="">{{name}}</li>
+    </ul> -->   
+    <ul class="list-group"
+         ng-show="usingInteractTool()">
+        <li class="list-group-item active">
+            <h6 class="list-group-item-heading">Create New Block</h6>
+        </li>
+        <div class="form-group">
+            <li class="list-group-item">
+                <label class="label-sm">Selection</label>
+                <select class="form-control form-control-sm"
+                        ng-model="blockForm.selectionName">
+                    <option ng-repeat="(name, items) in selections" 
+                            ng-value="name">{{name}}</option>
+                </select>
+            </li>
+            <li class="list-group-item">
+                <label class="label-sm">Trigger</label>
+                <select class="form-control form-control-sm"
+                        ng-model="blockForm.triggerName">
+                    <option ng-repeat="(name, lambda) in triggers" 
+                            ng-value="name">{{name}}</option>
+                </select>
+            </li>
+            <li class="list-group-item">
+                <label class="label-sm">Trigger Object</label>
+                <select class="form-control form-control-sm"
+                        ng-model="blockForm.triggerObjectName">
+                    <option ng-repeat="(name, items) in selections" 
+                            ng-if="blockForm.triggerName !== 'afterPrevious'"
+                            ng-value="name">{{name}}</option>
+                    <option ng-repeat="(id, blocks) in blocks"
+                            ng-if="blockForm.triggerName === 'afterPrevious'"
+                            ng-value="id">Block {{id}}</option>
+                </select>
+            </li>
+            <li class="list-group-item">
+                <label class="label-sm">Behavior</label>
+                <select class="form-control form-control-sm"
+                        ng-model="blockForm.behaviorName">
+                    <option ng-repeat="(name, lambda) in behaviors" 
+                            ng-value="name">{{name}}</option>
+                </select>
+            </li>
+            <li class="list-group-item">
+                <button ng-click="blockAdd(blockForm)"
+                        class="btn btn-sm btn-primary">Create</button>
+            </li>
+        </div>
+    </ul>
+
+    <button class="btn btn-sm btn-warning"
+            ng-click="deleteAllSelections()"
+            ng-show="!usingInteractTool()">Clear All Selections</button> 
+
+    <button class="btn btn-sm btn-danger"
+            ng-click="deleteAllNodes()"
+            ng-show="!usingInteractTool()">Clear Everything</button> 
+
+    <!-- <button class="btn btn-sm btn-primary"
+            ng-show="usingInteractTool()"
+            popover-template="blockMenuTemplateUrl"
+            popover-title="New Block"
+            popover-placement="right"
+            popover-trigger="click">New Block</button> -->
+    <ul class="list-group"
+        ng-show="usingInteractTool()">
+        <li class="list-group-item"
+        ng-repeat="block in blocks">
+            <!-- <code>
+                $({{block.triggerObjectName}}).{{block.triggerName}}
+                ({{block.behaviorName}}({{block.selectionName}}));
+            </code> -->
+            [{{block.id}}]
+            If {{block.triggerName}} of {{block.triggerObjectName}},
+            then {{block.behaviorName}} {{block.selectionName}}
+            <br>
+            <a href="" ng-click="blockActuate(block)">Test</a>
+            <a href="" ng-click="blockEdit(block)"
+               popover-template="blockMenuTemplateUrl"
+               popover-title="Edit Block"
+               popover-placement="top"
+               popover-trigger="click">Edit</a>
+            <a href="" ng-click="blockDelete(block)">Delete</a>
+        </li>
+    </ul>
+</div>

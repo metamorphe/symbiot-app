@@ -22,30 +22,27 @@
     <script src="./app/map/pointMenuDirective.js"></script>
     <script src="./app/map/ngRightClickDirective.js"></script>
     <script src="./app/behavior/behaviorService.js"></script>
+    <script src="./assets/bower_components/paper/dist/paper-full.js"></script>
   </head>
   <body ng-app="symbiotApp">
-    <div ng-controller="mapController" class="map-container container">
-        <div class="row no-gutter">
-            <div class="toolbar col-md-2">
-                <img src="./img/toolbar_mock.png"
-                     usemap="#toolbar-map"
-                     class="img-responsive">
-            </div>
-            <map name="toolbar-map">
-                <area shape="square" coords="10,35,45,65" ui-sref="click" />
-                <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
-                <area shape="square" coords="50,130,85,160" ui-sref="followTheLeader"/>
-                <area shape="square" coords="10,70,45,90" ui-sref="burst"/>
-            </map>
-            <div ui-view class="map col-md-10"></div>
-        </div>
+    <div ng-controller="mapController" id="page">
+            <div ui-view class="map">
 
-        <div class="btn-group row">
-            <label class="btn btn-default"
-                   ng-click="sendPoints()">Create Nodes</label>
-            <label class="btn btn-danger"
-                   ng-click="deletePoints()">Clear All</label>
-        </div>
+            </div>
+            
+                    
+                    
+                    
+               <!--  <img src="./img/toolbar_mock.png"
+                     usemap="#toolbar-map">
+                     <map name="toolbar-map">
+                        <area shape="square" coords="10,35,45,65" ui-sref="click" />
+                        <area shape="square" coords="50,35,95,65" ui-sref="sandbox" />
+                        <area shape="square" coords="10,130,45,160" ui-sref="lineFill" />
+                        <area shape="square" coords="50,130,85,160" ui-sref="followTheLeader"/>
+                        <area shape="square" coords="10,70,45,90" ui-sref="burst"/>
+                   -->  <!-- </map> -->
+            </div>
     </div>
 
   </body>
