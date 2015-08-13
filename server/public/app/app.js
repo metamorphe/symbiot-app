@@ -11,7 +11,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                 url: '/sandbox',
                 templateUrl: '../views/behaviors/_sandbox.html',
                 //controller: 'paperController' //FIXME: keeps complaining
-                controller: function($scope) {
+                controller: function($scope, nodeService) {
                     /* META LOGIC */
                     $scope.blockMenuTemplateUrl = '../views/_blockMenu.html';
                     $scope.usingInteractTool = function() {
@@ -29,6 +29,42 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                     $scope.viewSettings = {
                         viewMode: $scope.viewModes.virtual,
                         background: $scope.backgrounds.facade
+                    };
+                    /* For user study only */
+                    $scope.addPhysicalNode = function() {
+                        var points = [
+                           new Point(50, 50),
+                           new Point(50, 100),
+                           new Point(50, 150),
+                           new Point(50, 200),
+                           new Point(50, 250)
+                        ];
+                        points.forEach(function(point, index) {
+                            var path = new CompoundPath({
+                                children: [
+                                    new Path.Circle({
+                                        center: point,
+                                        radius: 20,
+                                        //strokeColor: $scope.defaultColor,
+                                        strokeWidth: 5,
+                                    }),
+                                    new PointText({
+                                        point: point.add([-5, 5]),
+                                        content: index + 1,
+                                        fontFamily: 'Source Code Pro',
+                                        fontWeight: 'bold',
+                                        fontSize: 25
+                                    })
+                                ],
+                                fillColor: $scope.defaultColor
+                            });
+                            var address = index + 1;
+                            //path.fillColor.alpha = 0.0;
+                            path.data.address = '0' + address;
+                            $scope.nodeGroup.addChild(path);
+                            nodeService.createNode(address, null);
+                        });
+                        nodeService.getNodes(function(data) {alert(data);});
                     };
                     
                     /* SELECTION LOGIC */
@@ -188,6 +224,15 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         //},
                         doNothing: function(item) {},
                         toggle: function(item) {
+                            /* Physical handling */
+                            if (item.data.address) {
+                                var address = item.data.address;
+                                if (item.fillColor.alpha === 1.0)
+                                    nodeService.setBrightness(0, address);
+                                else
+                                    nodeService.setBrightness(100, address);
+                            }
+                            /* Virtual Handling */
                             if (item.fillColor.alpha === 1.0)
                                 item.fillColor.alpha = 0.0;
                             else
@@ -371,8 +416,6 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 var hitResult = project.hitTest(event.point, hitOptions);
                                 if (!hitResult) {
                                     var point = new Point(event.point);
-                                    var color = $scope.colorHexes[$scope.colorIndex++
-                                            % $scope.colorHexes.length];
                                     var circle = new Path.Circle({
                                         center: point,
                                         radius: 20,
@@ -477,15 +520,6 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 for (handlerName in $scope.triggerUpHandlers) {
                                    $scope.triggerMouseUpHandlers[handlerName](event);
                                 };
-                            };
-
-                            view.onFrame = function(event) {
-                                if (actuating) {
-                                    recent.fillColor.hue += 10;
-                                    if (event.count > 120) {
-                                        actuating = false;
-                                    }
-                                }
                             };
                         });
                 }
