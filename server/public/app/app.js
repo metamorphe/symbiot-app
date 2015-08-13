@@ -31,7 +31,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                         background: $scope.backgrounds.facade
                     };
                     /* For user study only */
-                    $scope.addPhysicalNode = function() {
+                    $scope.addPhysicalNodes = function() {
                         var points = [
                            new Point(50, 50),
                            new Point(50, 100),
@@ -40,31 +40,34 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                            new Point(50, 250)
                         ];
                         points.forEach(function(point, index) {
-                            var path = new CompoundPath({
-                                children: [
-                                    new Path.Circle({
-                                        center: point,
-                                        radius: 20,
-                                        //strokeColor: $scope.defaultColor,
-                                        strokeWidth: 5,
-                                    }),
-                                    new PointText({
-                                        point: point.add([-5, 5]),
-                                        content: index + 1,
-                                        fontFamily: 'Source Code Pro',
-                                        fontWeight: 'bold',
-                                        fontSize: 25
-                                    })
-                                ],
-                                fillColor: $scope.defaultColor
+                            var circle = new Path.Circle({
+                                    center: point,
+                                    radius: 20,
+                                    fillColor: $scope.defaultColor,
+                                    strokeColor: $scope.defaultColor,
+                                    strokeWidth: 5
                             });
-                            var address = index + 1;
-                            //path.fillColor.alpha = 0.0;
-                            path.data.address = '0' + address;
-                            $scope.nodeGroup.addChild(path);
-                            nodeService.createNode(address, null);
+                            circle.fillColor.alpha = 0.0;
+                            circle.data.address = '0' + (index + 1);
+                            $scope.nodeGroup.addChild(circle);
                         });
-                        nodeService.getNodes(function(data) {alert(data);});
+                        var nodeJson = [
+                            { _id : 1, address: 1, x: 0, y: 0},
+                            { _id : 2, address: 2, x: 0, y: 0},
+                            { _id : 3, address: 3, x: 0, y: 0},
+                            { _id : 4, address: 4, x: 0, y: 0},
+                            { _id : 5, address: 5, x: 0, y: 0}
+                        ];
+                        nodeService.deleteNodes()
+                            .success(function() {
+                                nodeService.createNodes(nodeJson)
+                                    .success(function(data, status) {
+                                        alert('Success!');
+                                    })
+                                    .error(function(data, status) {
+                                        alert('Error.');
+                                    });
+                            });
                     };
                     
                     /* SELECTION LOGIC */
@@ -228,9 +231,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             if (item.data.address) {
                                 var address = item.data.address;
                                 if (item.fillColor.alpha === 1.0)
-                                    nodeService.setBrightness(0, address);
+                                    nodeService.setBrightness(address, 0);
                                 else
-                                    nodeService.setBrightness(100, address);
+                                    nodeService.setBrightness(address, 100);
                             }
                             /* Virtual Handling */
                             if (item.fillColor.alpha === 1.0)
