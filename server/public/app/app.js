@@ -51,6 +51,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             circle.data.address = index + 1;
                             $scope.nodeGroup.addChild(circle);
                         });
+                        view.update();
                         var nodeJson = [
                             { _id : 1, address: 1, x: 0, y: 0},
                             { _id : 2, address: 2, x: 0, y: 0},
@@ -96,6 +97,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             item.shadowColor = color;
                             item.shadowBlur = 20;
                         });
+                        view.update();
                     };
                     $scope.selectSelection = function(name) {
                         project.deselectAll();
@@ -111,12 +113,14 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             item.strokeColor = $scope.defaultColor;
                         });
                         delete $scope.selections[name];
+                        view.update();
                     };
                     $scope.deleteAllSelections = function() {
                         for (selectionName in $scope.selections) {
                             $scope.deleteSelection(selectionName);
                         };
                         $scope.selections = { none: [] };
+                        view.update();
                     };
                     $scope.deleteAllNodes = function() {
                         for (selection in $scope.selections) {
@@ -125,6 +129,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             });
                         };
                         $scope.selections = { none: [] };
+                        view.update();
                     };
                     $scope.selectionToColorMap = {};
                     $scope.selectionNameToColor = function(name) {
@@ -240,6 +245,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                 item.fillColor.alpha = 0.0;
                             else
                                 item.fillColor.alpha = 1.0;
+                            view.update();
                         },
                         flash: function(item) {
                             var i = 0;
@@ -258,6 +264,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     clearInterval(interval);
                                     item.fillColor.alpha = beginningAlpha;
                                 }
+                                view.update();
                                 i++;
                             }, 16); //Approximately 60 FPS
                         },
@@ -292,6 +299,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         item.fillColor.alpha -= 0.04;
                                     else
                                         clearInterval(interval);
+                                    view.update();
                                     i++;
                                 }, 16); //Approximately 60 FPS
                             } else {
@@ -302,6 +310,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                         item.fillColor.alpha += 0.04;
                                     else
                                         clearInterval(interval);
+                                    view.update();
                                     i++;
                                 }, 16); //Approximately 60 FPS
                             }
@@ -324,6 +333,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     item.fillColor.alpha = beginningAlpha;
                                 }
                                 i++;
+                                view.update();
                             }, 16); //Approximately 60 FPS
                         }
                     };
