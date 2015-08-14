@@ -8,6 +8,12 @@
                     ng-value="name">{{name}}</option>
         </select>
 
+        <label class="label-sm">Behavior</label>
+        <select class="form-control form-control-sm"
+                ng-model="block.behaviorName">
+            <option ng-repeat="(name, lambda) in behaviors" 
+                    ng-value="name">{{name}}</option>
+        </select>
 
         <label class="label-sm">Trigger</label>
         <select class="form-control form-control-sm"
@@ -15,7 +21,6 @@
             <option ng-repeat="(name, lambda) in triggers" 
                     ng-value="name">{{name}}</option>
         </select>
-        
 
         <label class="label-sm">Trigger Object</label>
         <select class="form-control form-control-sm"
@@ -27,15 +32,8 @@
                     ng-if="block.triggerName === 'afterPrevious'"
                     ng-value="id">Block {{id}}</option>
         </select>
-
-
-        <label class="label-sm">Behavior</label>
-        <select class="form-control form-control-sm"
-                ng-model="block.behaviorName">
-            <option ng-repeat="(name, lambda) in behaviors" 
-                    ng-value="name">{{name}}</option>
-        </select>
         <br>
+
         <button ng-click="editBlock(block)"
                 class="btn btn-sm btn-primary">
             Save Edits

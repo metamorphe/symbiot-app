@@ -102,6 +102,14 @@
                 </select>
             </li>
             <li class="list-group-item">
+                <label class="label-sm">Behavior</label>
+                <select class="form-control form-control-sm"
+                        ng-model="blockForm.behaviorName">
+                    <option ng-repeat="(name, lambda) in behaviors" 
+                            ng-value="name">{{name}}</option>
+                </select>
+            </li>
+            <li class="list-group-item">
                 <label class="label-sm">Trigger</label>
                 <select class="form-control form-control-sm"
                         ng-model="blockForm.triggerName">
@@ -119,14 +127,6 @@
                     <option ng-repeat="(id, blocks) in blocks"
                             ng-if="blockForm.triggerName === 'afterPrevious'"
                             ng-value="id">Block {{id}}</option>
-                </select>
-            </li>
-            <li class="list-group-item">
-                <label class="label-sm">Behavior</label>
-                <select class="form-control form-control-sm"
-                        ng-model="blockForm.behaviorName">
-                    <option ng-repeat="(name, lambda) in behaviors" 
-                            ng-value="name">{{name}}</option>
                 </select>
             </li>
             <li class="list-group-item">
@@ -159,8 +159,8 @@
                 ({{block.behaviorName}}({{block.selectionName}}));
             </code> -->
             [{{block.id}}]
-            If {{block.triggerName}} of {{block.triggerObjectName}},
-            then {{block.behaviorName}} {{block.selectionName}}
+            {{block.selectionName}} will {{block.behaviorName}}
+            {{block.triggerName}} of {{block.triggerObjectName}}
             <br>
             <a href="" ng-click="blockActuate(block)">Test</a>
             <a href="" ng-click="blockEdit(block)"
