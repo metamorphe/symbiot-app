@@ -29,9 +29,4 @@ angular.module('mapModule')
                 callback(data);
         });
     };
-
-    this.setBrightness = function(address, brightness) {
-        return $http.post('/devices/' + address + '/' + brightness);
-    };
-
 }]);

@@ -48,7 +48,7 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                                     strokeWidth: 5
                             });
                             circle.fillColor.alpha = 0.0;
-                            circle.data.address = '0' + (index + 1);
+                            circle.data.address = index + 1;
                             $scope.nodeGroup.addChild(circle);
                         });
                         var nodeJson = [
@@ -231,9 +231,9 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             if (item.data.address) {
                                 var address = item.data.address;
                                 if (item.fillColor.alpha === 1.0)
-                                    nodeService.setBrightness(address, 0);
+                                    nodeService.updateNode(address, { 'brightness' : 0 });
                                 else
-                                    nodeService.setBrightness(address, 100);
+                                    nodeService.updateNode(address, { 'brightness' : 100 });
                             }
                             /* Virtual Handling */
                             if (item.fillColor.alpha === 1.0)
@@ -246,15 +246,15 @@ var symbiotApp = angular.module('symbiotApp', ['mapModule', 'ui.bootstrap',
                             var beginningAlpha = item.fillColor.alpha;
                             item.fillColor.alpha = 1.0;
                             var interval = setInterval(function() {
-                                if (i < 10)
+                                if (i === 10) {
                                     item.fillColor.alpha = 1.0;
-                                else if (i < 20)
+                                } else if (i === 20) {
                                     item.fillColor.alpha = 0.0;
-                                else if (i < 30)
+                                } else if (i === 30) {
                                     item.fillColor.alpha = 1.0
-                                else if (i < 40)
+                                } else if (i === 40) {
                                     item.fillColor.alpha = 0.0;
-                                else {
+                                } else {
                                     clearInterval(interval);
                                     item.fillColor.alpha = beginningAlpha;
                                 }
